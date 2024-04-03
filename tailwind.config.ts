@@ -5,6 +5,8 @@ export const Palette = {
   "bg-external": '#7d82a4',
   "primary": '#2db36b',
   "primary-light": '#00d0cc',
+  "gray": '#505040',
+  "gray-light": '#a8a880',
 }
 
 const config: Config = {

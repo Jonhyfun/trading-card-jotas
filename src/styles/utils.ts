@@ -18,3 +18,14 @@ export const toggleCRT = (callback: (crtOn: boolean) => void) => {
   body.classList.toggle('crt')
   callback(body.classList.contains('crt'))
 }
+
+export type Subtract<T, U> = T & Exclude<T, U>
+
+export type PickEndsWith<T extends object, S extends string> = {
+  [K in keyof T as K extends `${infer R}${S}` ? K : never]: T[K]
+}
+
+export type StripPrefix<
+  TPrefix extends string,
+  T extends string, // changed this constraint to string
+> = T extends `${TPrefix}.${infer R}` ? R : never;

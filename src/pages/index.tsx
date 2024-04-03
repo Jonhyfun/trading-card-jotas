@@ -1,36 +1,47 @@
-import { Inter } from "next/font/google";
+import { Press_Start_2P } from "next/font/google";
 import { hexToRgb, pixelBorder, toggleCRT } from "@/styles/utils";
 import { Palette } from "../../tailwind.config";
 import { useState } from "react";
+import { TripleBorder } from "@/components/TripleBorder";
 
-const inter = Inter({ subsets: ["latin"] });
+const pixelFont = Press_Start_2P({ subsets: ["latin"], weight: ['400'] });
 
 export default function Home() {
   const [crtActivated, setCrtActivated] = useState(false);
 
   return (
     <main
-      className={`h-screen w-screen ${inter.className} bg-bg-external flex items-center justify-center p-8`}
+      className={`h-screen w-screen ${pixelFont.className} bg-bg-external flex items-center justify-center p-8`}
     >
       <div
         style={{
           ...pixelBorder('black', 1)
         }}
-        className="w-full h-full max-w-[40rem] max-h-[40rem]"
+        className="w-full h-full md:max-w-[40rem] md:max-h-[40rem] max-h-[30rem] max-w-[19rem]"
       >
-        <div
-          className="w-full h-full bg-black rounded-[10px]"
-        >
+        <div className="bg-black w-full h-full">
           <div
-            style={{
-              ...pixelBorder(hexToRgb(Palette['primary'])!, 1)
-            }}
-            className="w-full h-full p-0.5 bg-bg-internal rounded-[6px]"
+            className="w-full h-full bg-black rounded-[10px]"
           >
             <div
-              className="w-full h-full border-2 border-primary-light bg-bg-internal"
+              style={{
+                ...pixelBorder(hexToRgb(Palette['primary'])!, 1)
+              }}
+              className="w-full h-full bg-bg-internal p-0.5 rounded-[6px]"
             >
-              <div className="w-full h-full border-2 border-black bg-bg-internal" />
+              <div
+                className="w-full h-full border-2 border-primary-light bg-bg-internal"
+                >
+                <div className="w-full h-full border-2 border-black bg-bg-internal grid grid-rows-3 p-3">
+                  <span className="pt-8">Trading Card Game do Jotas em breve!</span>
+                  <TripleBorder className="row-span-2" borderColor="gray-light">
+                    <div className="w-full h-full md:p-5 md:pt-7 p-3 pt-5 flex flex-col gap-6 md:text-base text-xs">
+                      <div className="group cursor-pointer"><span className="group-hover:visible invisible mr-2">*</span><span>Nova Partida</span></div>
+                      <div className="group cursor-pointer"><span className="group-hover:visible invisible mr-2">*</span><span>Meus Decks</span></div>
+                    </div>
+                  </TripleBorder>
+                </div>
+              </div>
             </div>
           </div>
         </div>
