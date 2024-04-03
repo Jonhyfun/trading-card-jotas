@@ -30,11 +30,18 @@ export type StripPrefix<
   T extends string, // changed this constraint to string
 > = T extends `${TPrefix}.${infer R}` ? R : never;
 
+//? Os tons são diferentes e não mais claros/escuros para simular as limitações de um gameboy
+
 export const Palette = {
   "bg-internal": '#e0e0c0',
   "bg-external": '#7d82a4',
+
   "primary": '#2db36b',
   "primary-light": '#00d0cc',
+
+  "secondary": "#d00004",
+  "secondary-light": "#b32d75",
+
   "gray": '#505040',
   "gray-light": '#a8a880',
 }
