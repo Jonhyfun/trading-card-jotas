@@ -4,6 +4,7 @@ import { hexToRgb, pixelBorder, toggleCRT } from "@/styles/utils";
 import { Palette } from "../../tailwind.config";
 import { useState } from "react";
 import { TripleBorder } from "@/components/TripleBorder";
+import Link from 'next/link';
 
 const pixelFont = Press_Start_2P({ subsets: ["latin"], weight: ['400'] });
 
@@ -39,7 +40,7 @@ export default function Home() {
                   </span>
                   <TripleBorder className="row-span-2" borderColor="gray-light">
                     <div className="w-full h-full md:p-5 md:pt-7 p-3 pt-5 flex flex-col gap-6 md:text-base text-xs">
-                      <div className="group cursor-pointer"><span className="group-hover:visible invisible mr-2">*</span><span>Nova Partida</span></div>
+                      <Link href="/game/123" className="group cursor-pointer"><span className="group-hover:visible invisible mr-2">*</span><span>Nova Partida</span></Link>
                       <div className="group cursor-pointer"><span className="group-hover:visible invisible mr-2">*</span><span>Meus Decks</span></div>
                     </div>
                   </TripleBorder>
