@@ -2,6 +2,7 @@ import { Press_Start_2P } from "next/font/google";
 import { Palette } from "../../tailwind.config";
 import { hexToRgb, pixelBorder, toggleCRT } from "@/styles/utils";
 import { PropsWithChildren, useMemo, useState } from "react";
+import { useModal } from "@/hooks/useModal";
 
 const pixelFont = Press_Start_2P({ subsets: ["latin"], weight: ['400'] });
 
@@ -22,6 +23,7 @@ export const useCRT = () => { //TODO localstorage
 
 export function Layout({children} : PropsWithChildren<unknown>) {
   const crtButton = useCRT()
+  const {Modal} = useModal()
 
   return (
     <main
@@ -54,6 +56,7 @@ export function Layout({children} : PropsWithChildren<unknown>) {
           </div>
         </div>
       </div>
+      {Modal}
       {crtButton}
     </main>
   )
