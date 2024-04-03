@@ -22,7 +22,7 @@ export function StackedCards({interactive, cardContentClassName = '', reverse = 
   },[interactive])
   
   return (
-    <div className="grid place-content-center overflow-visible">
+    <div className="grid place-content-center overflow-visible w-fit">
       {cards.map((card, i) => (
         <button key={card} onMouseEnter={() => setHoveredCard(card)} onMouseLeave={() => setHoveredCard(undefined)} className="cursor-pointer" style={{gridColumn: 1, gridRow: 1, transform: `translateY(${!reverse ? '-' : ''}${i*gutterMultiplication}px)`}}  onClick={cycleThrough}>
           <TripleBorder className={`select-none ${hoveredCard === card ? 'opacity-100' : !hoveredCard ? '' : 'opacity-20'}`}>

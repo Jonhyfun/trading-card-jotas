@@ -46,7 +46,7 @@ export function Layout({children} : PropsWithChildren<unknown>) {
               <div
                 className="w-full h-full border-2 border-primary-light bg-bg-internal"
                 >
-                <div className="w-full h-full border-2 border-black bg-bg-internal grid grid-rows-3 p-3">
+                <div className="w-full h-full border-2 border-black bg-bg-internal p-3">
                   {children}
                 </div>
               </div>
