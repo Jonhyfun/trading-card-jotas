@@ -1,19 +1,14 @@
 import type { Config } from "tailwindcss";
-
-export const Palette = {
-  "bg-internal": '#e0e0c0',
-  "bg-external": '#7d82a4',
-  "primary": '#2db36b',
-  "primary-light": '#00d0cc',
-  "gray": '#505040',
-  "gray-light": '#a8a880',
-}
+import { Palette } from "./src/styles/utils";
 
 const config: Config = {
+  important: true,
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/hooks/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/layout/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {

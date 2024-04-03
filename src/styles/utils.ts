@@ -29,3 +29,12 @@ export type StripPrefix<
   TPrefix extends string,
   T extends string, // changed this constraint to string
 > = T extends `${TPrefix}.${infer R}` ? R : never;
+
+export const Palette = {
+  "bg-internal": '#e0e0c0',
+  "bg-external": '#7d82a4',
+  "primary": '#2db36b',
+  "primary-light": '#00d0cc',
+  "gray": '#505040',
+  "gray-light": '#a8a880',
+}

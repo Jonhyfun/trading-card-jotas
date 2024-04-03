@@ -1,6 +1,5 @@
 import { Press_Start_2P } from "next/font/google";
-import { Palette } from "../../tailwind.config";
-import { hexToRgb, pixelBorder, toggleCRT } from "@/styles/utils";
+import { hexToRgb, pixelBorder, toggleCRT, Palette } from "@/styles/utils";
 import { PropsWithChildren, useMemo, useState } from "react";
 import { useModal } from "@/hooks/useModal";
 

@@ -1,6 +1,5 @@
 import { PropsWithChildren } from "react";
-import { PickEndsWith, hexToRgb, pixelBorder } from "@/styles/utils";
-import { Palette } from "../../tailwind.config";
+import { Palette, PickEndsWith, hexToRgb, pixelBorder } from "@/styles/utils";
 
 type LightColors = keyof PickEndsWith<typeof Palette, '-light'>
 
