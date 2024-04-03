@@ -30,21 +30,30 @@ export default function Game() {
 
   return (
     <Layout>
-      <div className="w-full h-full flex justify-around items-start">
-        <StackedCards
-          color="primary-light"
-          onCardClick={(card) => handleCardClick("primary-light", card)}
-          cardContentClassNameOverwrite="w-12 h-16 pt-1"
-          gutterMultiplication={25}
-          reverse
-        />
-        <StackedCards
-          color="secondary-light"
-          onCardClick={(card) => handleCardClick("secondary-light", card)}
-          cardContentClassNameOverwrite="w-12 h-16 pt-1"
-          gutterMultiplication={25}
-          reverse
-        />
+      <div className="h-full w-full flex flex-col">
+      <div className="w-full flex justify-end">
+        {/**TODO componentizar */}
+          <TripleBorder borderColor="secondary-light" className="w-24 h-24 -scale-x-100"><img style={{imageRendering: 'pixelated'}} width={80} height={80} src="/bowgor80.png"/></TripleBorder>
+        </div>
+        <div className="w-full h-full flex justify-around items-start pt-12">
+          <StackedCards
+            color="primary-light"
+            onCardClick={(card) => handleCardClick("primary-light", card)}
+            cardContentClassNameOverwrite="w-12 h-16 pt-1"
+            gutterMultiplication={25}
+            reverse
+          />
+          <StackedCards
+            color="secondary-light"
+            onCardClick={(card) => handleCardClick("secondary-light", card)}
+            cardContentClassNameOverwrite="w-12 h-16 pt-1"
+            gutterMultiplication={25}
+            reverse
+          />
+        </div>
+        <div className="w-full">
+          <TripleBorder className="w-24 h-24"><img style={{imageRendering: 'pixelated'}} width={80} height={80} src="/indio80.png"/></TripleBorder>
+        </div>
       </div>
     </Layout>
   )
