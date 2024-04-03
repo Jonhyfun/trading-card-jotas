@@ -35,7 +35,7 @@ export default function Game() {
         {/**TODO componentizar */}
           <TripleBorder borderColor="secondary-light" className="w-24 h-24 -scale-x-100"><img style={{imageRendering: 'pixelated'}} width={80} height={80} src="/bowgor80.png"/></TripleBorder>
         </div>
-        <div className="w-full h-full flex justify-around items-start pt-12">
+        <div className="w-full h-full flex justify-around items-start md:pt-12 pt-6">
           <StackedCards
             color="primary-light"
             onCardClick={(card) => handleCardClick("primary-light", card)}
