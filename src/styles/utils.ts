@@ -42,6 +42,6 @@ export const Palette = {
   "secondary": "#d00004",
   "secondary-light": "#b32d75",
 
-  "gray": '#505040',
-  "gray-light": '#a8a880',
+  "gray": '#848479',
+  "gray-light": '#c2c2a6',
 }

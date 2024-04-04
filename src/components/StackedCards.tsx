@@ -28,7 +28,7 @@ export function StackedCards({/*interactive, */ onCardClick, cardContentClassNam
   return (
     <ol className="grid place-content-center overflow-visible w-fit">
       {cards.map((card, i) => (
-        <li key={card} onMouseEnter={() => setHoveredCard(card)} onMouseLeave={() => setHoveredCard(undefined)} className="cursor-pointer" style={{gridColumn: 1, gridRow: 1, transform: `translateY(${!reverse ? '-' : ''}${i*gutterMultiplication}px)`}}>
+        <li key={`${card}-stack-${reverse}-${color}`} onMouseEnter={() => setHoveredCard(card)} onMouseLeave={() => setHoveredCard(undefined)} className="cursor-pointer" style={{gridColumn: 1, gridRow: 1, transform: `translateY(${!reverse ? '-' : ''}${i*gutterMultiplication}px)`}}>
           <button onClick={onCardClick ? () => onCardClick(card) : undefined}>
             <TripleBorder borderColor={color} className={`select-none ${hoveredCard === card ? 'opacity-100' : !hoveredCard ? '' : 'opacity-20'}`}>
               <div className={cardContentClassNameOverwrite ? cardContentClassNameOverwrite : 'px-0.5 py-1.5'}>

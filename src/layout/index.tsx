@@ -32,7 +32,7 @@ export function Layout({children} : PropsWithChildren<unknown>) {
         style={{
           ...pixelBorder('black', 1)
         }}
-        className="w-full h-full md:max-w-[40rem] md:max-h-[40rem] max-h-[30rem] max-w-[19rem]"
+        className="w-full h-full md:max-w-[40rem] md:max-h-[40rem] max-h-[36rem]"
       >
         <div className="bg-black w-full h-full">
           <div
