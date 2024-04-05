@@ -14,10 +14,10 @@ export default function Game() {
     openModal({
       borderColor,
       children: (
-        <div className="w-[256px] h-[320px] p-2 pt-4 flex flex-col items-center gap-5 bg-gray">
+        <div className="w-[16rem] h-[20rem] p-2 pt-4 flex flex-col items-center gap-5 bg-gray">
           <TripleBorder borderColor="gray-light">
             <div className="w-32 h-32 bg-bg-internal flex justify-center items-center text-2xl">
-              {card}
+              <img className="w-full h-full" style={{imageRendering: 'pixelated'}} src="/indio80.png"/>
             </div>
           </TripleBorder>
           <TripleBorder borderColor="gray-light">
@@ -55,7 +55,7 @@ export default function Game() {
         </div>
         <div className="w-full flex items-start justify-end pr-0.5 mb-2">
           {selectedCard && (
-            <div onClick={() => handleCardClick("primary-light", selectedCard)} className="w-[64px] h-[84px] cursor-pointer">
+            <div onClick={() => handleCardClick("primary-light", selectedCard)} className="w-[4rem] h-[5.25rem] cursor-pointer">
               <Card card={selectedCard} />
             </div>
           )}

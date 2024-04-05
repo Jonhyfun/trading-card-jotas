@@ -19,14 +19,14 @@ export function TripleBorder({children, className = '', borderColor = 'primary-l
   >
     <div className="bg-black w-full h-full">
       <div
-        className="bg-black rounded-[10px] w-full h-full"
+        className="bg-black w-full h-full"
       >
         <div
           style={{
             ...pixelBorder(hexToRgb(Palette[borderColor])!, 1),
-            backgroundColor,
+            boxShadow: `inset 0 0 0 20px ${backgroundColor}`,
           }}
-          className="p-0.5 rounded-[6px] w-full h-full"
+          className="p-0.5 bg-black w-full h-full"
           >
           <div
             style={{

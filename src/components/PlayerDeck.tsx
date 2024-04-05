@@ -1,4 +1,4 @@
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { ProfileSquare } from "./ProfileSquare";
 import { CardData } from "./StackedCards";
 import { TripleBorder } from "./TripleBorder";
@@ -11,9 +11,8 @@ type PlayerDeckProps = {
   onCardClick?: (card: CardData) => void
 }
 
-export function PlayerDeck({playerSrc, onCardClick = () => {},deck: _deck = [], rival = false} : PlayerDeckProps) {
-
-  const [deck, setDeck] = useState(_deck)
+export function PlayerDeck({playerSrc, onCardClick = () => {}, deck: _deck = [], rival = false} : PlayerDeckProps) {
+  const [deck, setDeck] = useState<CardData[]>(_deck)
 
   const cycleThrough : MouseEventHandler<HTMLButtonElement> = ((e) => {
     setDeck((current) => {
@@ -27,10 +26,10 @@ export function PlayerDeck({playerSrc, onCardClick = () => {},deck: _deck = [], 
     <div className={`w-full flex gap-2 items-center ${rival ? 'flex-row-reverse' : ''} md:gap-4`}>
       <ProfileSquare borderColor={rival ? "secondary-light" : "primary-light"} className="w-24 shrink-0 col-span-1" src={playerSrc} reverse={rival}/>
       <TripleBorder borderColor="gray-light" className="w-full">
-        <div className="flex relative gap-0.5 flex-wrap md:justify-start overflow-y-hidden md:overflow-y-visible items-center justify-center w-full h-[76px]">
+        <div className="flex relative gap-0.5 flex-wrap md:justify-start overflow-y-hidden md:overflow-y-visible items-center justify-center w-full h-[4.75rem]">
           {(rival ? ['1','2','3','4','5'] : deck).map((card) => (
             <div key={`${card}-inventory`} className="md:px-1 py-1 px-0 h-full flex items-center cursor-pointer md:hover:-translate-y-5 hover:-translate-y-2">
-              <div onClick={() => onCardClick(card)} className="md:w-12 md:h-[68px] w-9 h-[46px] block">
+              <div onClick={() => onCardClick(card)} className="md:w-12 md:h-[4.25rem] w-9 h-[2.875rem] block">
                 <Card className="text-xs" card={card} facingDown={rival} />
               </div>
             </div>
