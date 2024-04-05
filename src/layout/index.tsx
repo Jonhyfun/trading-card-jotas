@@ -30,9 +30,10 @@ export function Layout({children} : PropsWithChildren<unknown>) {
     >
       <div
         style={{
-          ...pixelBorder('black', 1)
+          ...pixelBorder('black', 1),
+          boxShadow: '3px 3px 8px 2px #00000040'
         }}
-        className="w-full h-full md:max-w-[40rem] md:max-h-[40rem] max-h-[36rem]"
+        className="w-full h-full md:max-w-[40rem] md:max-h-[40rem] max-h-[36rem] rounded-[10px]"
       >
         <div className="bg-black w-full h-full">
           <div
