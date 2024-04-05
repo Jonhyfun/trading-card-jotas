@@ -55,7 +55,7 @@ export default function Game() {
         </div>
         <div className="w-full flex items-start justify-end pr-0.5 mb-2">
           {selectedCard && (
-            <div className="w-[64px] h-[84px] cursor-pointer">
+            <div onClick={() => handleCardClick("primary-light", selectedCard)} className="w-[64px] h-[84px] cursor-pointer">
               <Card card={selectedCard} />
             </div>
           )}
