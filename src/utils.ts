@@ -1,3 +1,5 @@
+import { CardData } from "./components/StackedCards";
+
 export const pixelBorder = (fill: string, outset = 2, width = 2) => ({
   borderImageSource: `url('data:image/svg+xml;utf8,<?xml version="1.0" encoding="UTF-8" ?><svg version="1.1" width="5" height="5" xmlns="http://www.w3.org/2000/svg"><path d="M2 1 h1 v1 h-1 z M1 2 h1 v1 h-1 z M3 2 h1 v1 h-1 z M2 3 h1 v1 h-1 z" fill="${fill}" /></svg>')`,
   borderImageSlice: 2,
@@ -45,3 +47,26 @@ export const Palette = {
   "gray": '#848479',
   "gray-light": '#c2c2a6',
 }
+
+export const mockCards: CardData[] = [
+  {
+    id: '1',
+    src: '/indio80.png',
+  },
+  {
+    id: '2',
+    src: '/indio80.png',
+  },
+  {
+    id: '3',
+    src: '/indio80.png',
+  },
+  {
+    id: '4',
+    src: '/indio80.png',
+  },
+  {
+    id: '5',
+    src: '/indio80.png',
+  },
+]

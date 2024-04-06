@@ -4,6 +4,7 @@ import { CardData, StackedCards } from "@/components/StackedCards";
 import { TripleBorder, TripleBorderProps } from "@/components/TripleBorder";
 import { useModal } from "@/hooks/useModal";
 import { Layout } from "@/layout";
+import { mockCards } from "@/utils";
 import { useState } from "react";
 
 export default function Game() {
@@ -62,7 +63,7 @@ export default function Game() {
         </div>
         <PlayerDeck
           playerSrc="/indio80.png"
-          deck={['1', '2', '3', '4', '5']}
+          deck={mockCards.map((card) => ({...card, invisible: selectedCard?.id === card.id}))} //TODO nao vai atualizar kkkkkk (melhor extrair o state, paciencia)
           onCardClick={setSelectedCard}
         />
       </div>
