@@ -51,22 +51,22 @@ export const Palette = {
 export const mockCards: CardData[] = [
   {
     id: '1',
-    src: '/indio80.png',
+    src: 'https://i.pinimg.com/236x/c0/b5/ac/c0b5ace4eeb926524451b476f50279b0.jpg',
   },
   {
     id: '2',
-    src: '/indio80.png',
+    src: 'https://pm1.aminoapps.com/6952/fa93f664a40cf66d9b945ee5df5441e4a39da806r1-504-504v2_hq.jpg',
   },
   {
     id: '3',
-    src: '/indio80.png',
+    src: 'https://i.seadn.io/gae/UKmQNWmv9IYTg1jpJTGTlyji-hT7GKtSg1NurSiqRD4QHDSgetjILYYJXCapXL5hu2hfmDbYRgSDgA0OYuNn4yx1buNz8BwQDiKoAyY?auto=format&dpr=1&w=1000',
   },
   {
     id: '4',
-    src: '/indio80.png',
+    src: 'https://art.ngfiles.com/images/3311000/3311863_inkutheart_jojo-stone-mask-32x32.png?f1688594463',
   },
   {
     id: '5',
-    src: '/indio80.png',
+    src: 'https://static.wikia.nocookie.net/47d29547-0600-4f63-a873-700ddf9572c2',
   },
 ]

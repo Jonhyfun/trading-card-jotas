@@ -1,15 +1,20 @@
 import { Card } from "@/components/Card";
-import { PlayerDeck } from "@/components/PlayerDeck";
+import { DeckCards, PlayerDeck } from "@/components/PlayerDeck";
 import { CardData, StackedCards } from "@/components/StackedCards";
 import { TripleBorder, TripleBorderProps } from "@/components/TripleBorder";
 import { useModal } from "@/hooks/useModal";
 import { Layout } from "@/layout";
 import { mockCards } from "@/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Game() {
   const {openModal} = useModal()
-  const [selectedCard, setSelectedCard] = useState<CardData>();
+  const [selectedCard, setSelectedCard] = useState<CardData>()
+  const [deck, setDeck] = useState<DeckCards>(mockCards)
+
+  useEffect(() => {
+    setDeck(mockCards.map((card) => ({...card, selected: card.id === selectedCard?.id})))
+  },[selectedCard])
 
   const handleCardClick = (borderColor: TripleBorderProps['borderColor'], card: CardData) => {
     openModal({
@@ -18,7 +23,7 @@ export default function Game() {
         <div className="w-[16rem] h-[20rem] p-2 pt-4 flex flex-col items-center gap-5 bg-gray">
           <TripleBorder borderColor="gray-light">
             <div className="w-32 h-32 bg-bg-internal flex justify-center items-center text-2xl">
-              <img className="w-full h-full" style={{imageRendering: 'pixelated'}} src="/indio80.png"/>
+              <img className="w-full h-full" style={{imageRendering: 'pixelated'}} src={card.src}/>
             </div>
           </TripleBorder>
           <TripleBorder borderColor="gray-light">
@@ -63,7 +68,7 @@ export default function Game() {
         </div>
         <PlayerDeck
           playerSrc="/indio80.png"
-          deck={mockCards.map((card) => ({...card, invisible: selectedCard?.id === card.id}))} //TODO nao vai atualizar kkkkkk (melhor extrair o state, paciencia)
+          deckState={[deck, setDeck]} //TODO nao vai atualizar kkkkkk (melhor extrair o state, paciencia)
           onCardClick={setSelectedCard}
         />
       </div>

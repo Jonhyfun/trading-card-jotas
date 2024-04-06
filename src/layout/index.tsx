@@ -2,6 +2,7 @@ import { Press_Start_2P } from "next/font/google";
 import { hexToRgb, pixelBorder, toggleCRT, Palette } from "@/utils";
 import { PropsWithChildren, useMemo, useState } from "react";
 import { useModal } from "@/hooks/useModal";
+import { CheckeredPatternIcon } from "@/icons/CheckeredPatternIcon";
 
 const pixelFont = Press_Start_2P({ subsets: ["latin"], weight: ['400'] });
 
@@ -13,7 +14,7 @@ export const useCRT = () => { //TODO localstorage
         {crtActivated ? (
           <div className="w-5/6 h-5/6 bg-black"/>
           ) : (
-            <svg className='w-full h-full' width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M2 2H22V22H2V2ZM4 4V8H8V12H4V16H8V20H12V16H16V20H20V16H16V12H20V8H16V4H12V8H8V4H4ZM12 12H8V16H12V12ZM12 8V12H16V8H12Z" fill="currentColor"></path></svg>
+            <CheckeredPatternIcon/>
           )
         }
       </div>
