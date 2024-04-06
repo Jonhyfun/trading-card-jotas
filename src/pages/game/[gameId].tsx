@@ -54,7 +54,7 @@ export default function Game() {
            * //TODO setinha da alegria aqui se tiver uma carta selecionada (pro cara decidir a pilha) 
           **/}
         </div>
-        <div className="w-full flex items-start justify-end pr-0.5 mb-2">
+        <div className="w-full flex items-start justify-end mb-2">
           {selectedCard && (
             <div onClick={() => handleCardClick("primary-light", selectedCard)} className="w-[4rem] h-[5.25rem] cursor-pointer">
               <Card card={selectedCard} />
