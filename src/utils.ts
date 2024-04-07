@@ -48,7 +48,7 @@ export const Palette = {
   "gray-light": '#c2c2a6',
 }
 
-export const mockCards: CardData[] = [
+export const mockCards: Omit<CardData, 'borderColor'>[] = [
   {
     id: '1',
     src: 'https://i.pinimg.com/236x/c0/b5/ac/c0b5ace4eeb926524451b476f50279b0.jpg',
