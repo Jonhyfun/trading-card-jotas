@@ -10,10 +10,10 @@ import { useEffect, useState } from "react";
 export default function Game() {
   const {openModal} = useModal()
   const [selectedCard, setSelectedCard] = useState<CardData>()
-  const [deck, setDeck] = useState<DeckCards>(mockCards)
+  const [deck, setDeck] = useState<DeckCards>(mockCards.map((card) => ({...card, borderColor: 'primary-light'})))
 
   useEffect(() => {
-    setDeck(mockCards.map((card) => ({...card, selected: card.id === selectedCard?.id})))
+    setDeck(mockCards.map((card) => ({...card, borderColor: 'primary-light', selected: card.id === selectedCard?.id})))
   },[selectedCard])
 
   const handleCardClick = (borderColor: TripleBorderProps['borderColor'], card: CardData) => {
@@ -42,18 +42,20 @@ export default function Game() {
         <PlayerDeck playerSrc="/bowgor80.png" rival/>
         <div className="w-full h-full flex justify-around items-start md:pt-12 pt-6">
           <StackedCards
-            color="primary-light"
+            cards={mockCards.map((card) => ({...card, borderColor: 'primary-light'}))}
             onCardClick={(card) => handleCardClick("primary-light", card)}
-            cardContentClassNameOverwrite="w-12 h-16 pt-1"
             gutterMultiplication={25}
             reverse
+            selectedCard={selectedCard}
+            onCardPlacement={() => setSelectedCard(undefined)}
           />
           <StackedCards
-            color="secondary-light"
+            cards={mockCards.map((card) => ({...card, borderColor: 'secondary-light'}))}
             onCardClick={(card) => handleCardClick("secondary-light", card)}
-            cardContentClassNameOverwrite="w-12 h-16 pt-1"
             gutterMultiplication={25}
             reverse
+            selectedCard={selectedCard}
+            onCardPlacement={() => setSelectedCard(undefined)}
           />
           {/**
            * //TODO setinha da alegria aqui se tiver uma carta selecionada (pro cara decidir a pilha) 
@@ -61,7 +63,7 @@ export default function Game() {
         </div>
         <div className="w-full flex items-start justify-end mb-2">
           {selectedCard && (
-            <div onClick={() => handleCardClick("primary-light", selectedCard)} className="w-[4rem] h-[5.25rem] cursor-pointer">
+            <div onClick={() => handleCardClick("primary-light", selectedCard)} className="w-[4rem] h-[5.25rem] cursor-pointer z-10">
               <Card card={selectedCard} />
             </div>
           )}

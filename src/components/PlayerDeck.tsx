@@ -1,7 +1,7 @@
 import { Dispatch, MouseEventHandler, SetStateAction, useState } from "react";
 import { ProfileSquare } from "./ProfileSquare";
 import { CardData } from "./StackedCards";
-import { TripleBorder } from "./TripleBorder";
+import { TripleBorder, TripleBorderProps } from "./TripleBorder";
 import { Card } from "./Card";
 import { mockCards } from "@/utils";
 
@@ -20,13 +20,13 @@ export function PlayerDeck({playerSrc, onCardClick = () => {}, deckState: _deckS
   const deckState = useState<DeckCards>([])
   const [deck, setDeck] = _deckState ?? deckState;
 
-  const cycleThrough : MouseEventHandler<HTMLButtonElement> = ((e) => {
-    setDeck((current) => {
-      const newCurrent = [...current]
-      const oldNew = newCurrent.shift();
-      return oldNew ? [...newCurrent, oldNew] : newCurrent
-    })
-  })
+  //const cycleThrough : MouseEventHandler<HTMLButtonElement> = ((e) => {
+  //  setDeck((current) => {
+  //    const newCurrent = [...current]
+  //    const oldNew = newCurrent.shift();
+  //    return oldNew ? [...newCurrent, oldNew] : newCurrent
+  //  })
+  //})
 
   return (
     <div className={`w-full flex gap-2 items-center ${rival ? 'flex-row-reverse' : ''} md:gap-4`}>
