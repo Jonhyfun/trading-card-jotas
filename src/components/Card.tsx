@@ -16,7 +16,7 @@ export function Card({card, className = '', borderColor = "primary-light", facin
       <div className={`flex justify-start pt-1 pb-1 h-full items-center flex-col gap-1 ${facingDown ? "text-primary bg-primary" : ''} ${className}`}>
         {!facingDown && (
           <>
-            <img className="w-[calc(100%-0.625rem)] aspect-square" style={{...pixelBorder('black'), imageRendering: 'pixelated'}} src={card.src}/>
+            <img draggable={false} className="w-[calc(100%-10px)] aspect-square select-none" style={{...pixelBorder('black')}} src={card.src}/>
             <TextPreviewIcon/>
           </>
         )}

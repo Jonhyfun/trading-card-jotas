@@ -32,7 +32,7 @@ export function PlayerDeck({playerSrc, onCardClick = () => {}, deckState: _deckS
     <div className={`w-full flex gap-2 items-center ${rival ? 'flex-row-reverse' : ''} md:gap-4`}>
       <ProfileSquare borderColor={rival ? "secondary-light" : "primary-light"} className="w-16 md:w-24 shrink-0 col-span-1" src={playerSrc} reverse={rival}/>
       <TripleBorder borderColor="gray-light" className="w-full">
-        <div className="md:flex relative md:gap-0.5 md:justify-start items-center justify-center flex-wrap w-full h-[4.75rem] grid grid-cols-5 gap-1 overflow-x-auto md:overflow-visible">
+        <div className="md:flex relative md:gap-0.5 md:justify-start items-center justify-center flex-wrap w-full h-[4.75rem] grid grid-cols-5 gap-1 overflow-y-hidden overflow-x-auto md:overflow-y-visible md:overflow-visible">
           {(rival ? mockCards as DeckCards : deck).map((card) => (
             <div key={`${card.id}-inventory`} onClick={() => onCardClick((card as CardData))} className={`${card.selected ? 'md:-translate-y-3 -translate-y-1' : ''} md:px-1 py-1 px-0 h-full flex items-center cursor-pointer md:hover:-translate-y-3 hover:-translate-y-1`}>
               <div className="min-w-12 w-12 h-[4.25rem] block">

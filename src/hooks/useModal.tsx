@@ -20,7 +20,7 @@ export function useModal() {
 
   const Modal = useMemo(() => (
     !modalData?.open ? <></> : (
-      <dialog id="modal" onMouseDown={(e) => (e.target as HTMLElement).id === "modal" ? closeModal() : null} open className="fixed w-screen h-screen inset-0 bg-[#00000069] flex justify-center items-center">
+      <dialog id="modal" onMouseDown={(e) => (e.target as HTMLElement).id === "modal" ? closeModal() : null} open className="fixed z-50 w-screen h-screen inset-0 bg-[#00000069] flex justify-center items-center">
         <TripleBorder {...modalData.modalContentProps}/>
       </dialog>
     )

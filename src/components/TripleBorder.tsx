@@ -7,11 +7,13 @@ export type TripleBorderProps = PropsWithChildren<{
   backgroundColor?: string,
   className?: string
   borderColor?: LightColors
+  onClick?: () => void
 }>
 
-export function TripleBorder({children, className = '', borderColor = 'primary-light', backgroundColor = Palette['bg-internal']} : TripleBorderProps) {
+export function TripleBorder({children, onClick, className = '', borderColor = 'primary-light', backgroundColor = Palette['bg-internal']} : TripleBorderProps) {
   return (
     <div
+    onClick={onClick}
     style={{
       ...pixelBorder('black', 1)
     }}

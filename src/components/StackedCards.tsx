@@ -1,6 +1,8 @@
-import { useCallback, useState } from "react"
+import { ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useState } from "react"
 import { Card } from "./Card"
 import { TripleBorderProps } from "./TripleBorder"
+
+//todo Matematica Man
 
 export type CardData = {
   src: string
@@ -17,7 +19,7 @@ type StackedCardsProps = {
   onCardClick?: (card: CardData) => void
 }
 
-export function StackedCards({cards: _cards, onCardClick, onCardPlacement, selectedCard, reverse = false, gutterMultiplication = 4} : StackedCardsProps) {
+export const StackedCards = forwardRef(({cards: _cards, onCardClick, onCardPlacement, selectedCard, reverse = false} : StackedCardsProps, ref: ForwardedRef<HTMLOListElement>) => {
   const [cards, setCards] = useState(_cards)
   const [hoveredCardId, setHoveredCardId] = useState<CardData['id'] | undefined>()
 
@@ -27,26 +29,34 @@ export function StackedCards({cards: _cards, onCardClick, onCardPlacement, selec
       if(onCardPlacement) onCardPlacement(selectedCard)
     }
   },[onCardPlacement, selectedCard])
+
+  useEffect(() => {
+    //? O ref ta vindo de fora por que acho que embreve ele vai triggar esse scroll em resposta à uma mensagem do socket.
+    const stackRef = ref as MutableRefObject<HTMLOListElement>
+    if(selectedCard && stackRef.current) {
+      stackRef.current.scroll(stackRef.current.scrollWidth, 0);
+    }
+  },[ref, selectedCard])
   
   return (
-    <ol className="grid place-content-center overflow-visible w-fit">
+    <ol ref={ref} style={{gridAutoFlow: 'column', gridTemplateColumns: 'repeat(auto-fit, minmax(78px, 78px))'}} className="grid gap-0.5 overflow-x-auto">
       {cards.map((card, i) => (
-        <li key={`${card.id}-stack-${reverse}-${card.borderColor}`} onMouseEnter={() => setHoveredCardId(card.id)} onMouseLeave={() => setHoveredCardId(undefined)} className={`cursor-pointer ${(hoveredCardId !== undefined && hoveredCardId !== card.id) ? 'opacity-25' : ''}`} style={{gridColumn: 1, gridRow: 1, transform: `translateY(${!reverse ? '-' : ''}${i*gutterMultiplication}px)`}}>
-          <button className="h-[5.25rem]" onClick={onCardClick ? () => onCardClick(card) : undefined}>
-            <Card borderColor={card.borderColor} card={card} className="w-12 h-[4rem]"/>
+        <li key={`${card.id}-stack-${reverse}-${card.borderColor}`} onMouseEnter={() => setHoveredCardId(card.id)} onMouseLeave={() => setHoveredCardId(undefined)} className={`cursor-pointer ${(hoveredCardId !== undefined && hoveredCardId !== card.id) ? 'opacity-25' : ''}`}>
+          <button className="h-[6.75rem]" onClick={onCardClick ? () => onCardClick(card) : undefined}>
+            <Card borderColor={card.borderColor} card={card} className="w-[3.625rem] h-[6.75rem]"/>
           </button>
         </li>
       ))}
       {selectedCard && (
-        <li className="h-[5.25rem] group relative" style={{gridColumn: 1, gridRow: 1, transform: `translateY(${!reverse ? '-' : ''}${(cards.length*gutterMultiplication) + 62}px)`}}>
+        <li className="h-[6.75rem] group relative">
           <li
-            className="absolute top-0 left-0 border-dashed border-2 w-full h-[5.25rem] bg-bg-internal bg-opacity-45 cursor-pointer"
+            className="absolute top-0 left-0 border-dashed border-2 w-[4.875rem] h-[6.75rem] bg-bg-internal bg-opacity-45 cursor-pointer"
           />
-          <button onClick={handleCardPlacement} className="absolute top-0 left-0 h-[5.25rem] invisible group-hover:visible opacity-45">
-            <Card borderColor={selectedCard.borderColor} card={selectedCard} className="w-12 h-[4rem]"/>
+          <button onClick={handleCardPlacement} className="absolute top-0 left-0 h-[6.75rem] invisible group-hover:visible opacity-45">
+            <Card borderColor={selectedCard.borderColor} card={selectedCard} className="w-[3.625rem] h-[6.75rem]"/>
           </button>
         </li>
       )}
     </ol>
   )
-}
+})

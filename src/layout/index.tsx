@@ -1,6 +1,6 @@
 import { Press_Start_2P } from "next/font/google";
 import { hexToRgb, pixelBorder, toggleCRT, Palette } from "@/utils";
-import { PropsWithChildren, useMemo, useState } from "react";
+import { CSSProperties, PropsWithChildren, useMemo, useState } from "react";
 import { useModal } from "@/hooks/useModal";
 import { CheckeredPatternIcon } from "@/icons/CheckeredPatternIcon";
 
@@ -22,7 +22,7 @@ export const useCRT = () => { //TODO localstorage
   ),[crtActivated])
 }
 
-export function Layout({children} : PropsWithChildren<unknown>) {
+export function Layout({children, style} : PropsWithChildren<{style?: CSSProperties}>) {
   const crtButton = useCRT()
   const {Modal} = useModal()
 
@@ -51,7 +51,7 @@ export function Layout({children} : PropsWithChildren<unknown>) {
               <div
                 className="w-full h-full border-2 border-primary-light bg-bg-internal"
                 >
-                <div className="w-full h-full border-2 border-black bg-bg-internal p-3">
+                <div style={style} className="w-full h-full border-2 border-black bg-bg-internal p-3">
                   {children}
                 </div>
               </div>

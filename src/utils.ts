@@ -13,6 +13,19 @@ export const hexToRgb = (hex: string) => {
   return result ? `rgb(${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)})` : null;
 }
 
+export const makeId = (length: number) => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
+
+
 export const toggleCRT = (callback: (crtOn: boolean) => void) => {
   const body = document.querySelector('body')
   if (!body) return
@@ -51,22 +64,22 @@ export const Palette = {
 export const mockCards: Omit<CardData, 'borderColor'>[] = [
   {
     id: '1',
-    src: 'https://i.pinimg.com/236x/c0/b5/ac/c0b5ace4eeb926524451b476f50279b0.jpg',
+    src: 'http://localhost/cardImage/two.png',
   },
   {
     id: '2',
-    src: 'https://pm1.aminoapps.com/6952/fa93f664a40cf66d9b945ee5df5441e4a39da806r1-504-504v2_hq.jpg',
+    src: 'http://localhost/cardImage/minus.png',
   },
   {
     id: '3',
-    src: 'https://i.seadn.io/gae/UKmQNWmv9IYTg1jpJTGTlyji-hT7GKtSg1NurSiqRD4QHDSgetjILYYJXCapXL5hu2hfmDbYRgSDgA0OYuNn4yx1buNz8BwQDiKoAyY?auto=format&dpr=1&w=1000',
+    src: 'http://localhost/cardImage/x.png',
   },
   {
     id: '4',
-    src: 'https://art.ngfiles.com/images/3311000/3311863_inkutheart_jojo-stone-mask-32x32.png?f1688594463',
+    src: 'http://localhost/cardImage/exclamation.png',
   },
   {
     id: '5',
-    src: 'https://static.wikia.nocookie.net/47d29547-0600-4f63-a873-700ddf9572c2',
+    src: 'http://localhost/cardImage/interrogation.png',
   },
 ]
