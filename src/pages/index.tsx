@@ -1,21 +1,22 @@
 import Typewriter from 'react-ts-typewriter';
-import { TripleBorder } from "@/components/TripleBorder";
 import Link from 'next/link';
+import { TripleBorder } from "@/components/TripleBorder";
 import { Layout } from '@/layout';
 import { useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { makeId } from '@/utils';
-import { useSocket } from '@/hooks/useSocket';
+import { makeId } from '@/utils/any';
+import { useGameSocket } from '@/hooks/useGameSocket';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 export default function Home() {
   const router = useRouter()
-  const socket = useSocket()
+  const socket = useGameSocket()
+  const { localDeck } = useLocalStorage()
 
   const createGame = useCallback(() => {
     const game = makeId(5)
-    socket.joinRoom(game)
     router.push(`/game/${game}`)
-  },[router, socket])
+  },[router])
 
   return (
     <Layout>
@@ -23,7 +24,7 @@ export default function Home() {
         <Typewriter cursor={false} text="Trading Card Game do Jotas em breve!"/>
         <TripleBorder className="row-span-2" borderColor="gray-light">
           <div className="w-full h-full md:p-5 md:pt-7 p-3 pt-5 flex flex-col gap-6 md:text-base text-xs">
-            <div onClick={() => createGame()} className="group cursor-pointer"><span className="group-hover:visible invisible mr-2">*</span><span>Nova Partida</span></div>
+            <div onClick={createGame} className={`${(localDeck && localDeck.length === 20) ? 'group' : 'cursor-auto opacity-40'} cursor-pointer`}><span className="group-hover:visible invisible mr-2">*</span><span>Nova Partida</span></div>
             <Link href="/deck" className="group cursor-pointer"><div className="group cursor-pointer"><span className="group-hover:visible invisible mr-2">*</span><span>Meus Decks</span></div></Link>
           </div>
         </TripleBorder>

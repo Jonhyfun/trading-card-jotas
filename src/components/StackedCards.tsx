@@ -40,7 +40,7 @@ export const StackedCards = forwardRef(({cards: _cards, onCardClick, onCardPlace
   
   return (
     <ol ref={ref} style={{gridAutoFlow: 'column', gridTemplateColumns: 'repeat(auto-fit, minmax(78px, 78px))'}} className="grid gap-0.5 overflow-x-auto">
-      {cards.map((card, i) => (
+      {(cards ?? []).map((card, i) => (
         <li key={`${card.id}-stack-${reverse}-${card.borderColor}`} onMouseEnter={() => setHoveredCardId(card.id)} onMouseLeave={() => setHoveredCardId(undefined)} className={`cursor-pointer ${(hoveredCardId !== undefined && hoveredCardId !== card.id) ? 'opacity-25' : ''}`}>
           <button className="h-[6.75rem]" onClick={onCardClick ? () => onCardClick(card) : undefined}>
             <Card borderColor={card.borderColor} card={card} className="w-[3.625rem] h-[6.75rem]"/>

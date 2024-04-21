@@ -1,30 +1,33 @@
 import { Card } from "@/components/Card";
 import { DeckCards, PlayerDeck } from "@/components/PlayerDeck";
 import { CardData, StackedCards } from "@/components/StackedCards";
-import { TripleBorder, TripleBorderProps } from "@/components/TripleBorder";
+import { TripleBorder } from "@/components/TripleBorder";
 import { useModal } from "@/hooks/useModal";
+import { useGameSocket } from "@/hooks/useGameSocket";
 import { Layout } from "@/layout";
-import { mockCards } from "@/utils";
-import { useEffect, useRef, useState } from "react";
+import { mockCards } from "@/utils/any";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Loading } from "@/components/Loading";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 export default function Game() {
-  const {openModal} = useModal()
+  const router = useRouter()
+  const {localDeck} = useLocalStorage()
+  const { joinRoom, lockStance, setCard, gameData } = useGameSocket();
+  const { openModal } = useModal()
   const [selectedCard, setSelectedCard] = useState<CardData>()
-  const [deck, setDeck] = useState<DeckCards>(mockCards.map((card) => ({...card, borderColor: 'primary-light'})))
+  const [deck, setDeck] = useState<DeckCards | null>(null)
 
   const defenseStackRef = useRef<HTMLOListElement>(null)
   const attackStackRef = useRef<HTMLOListElement>(null)
 
-  //? Era melhor as stacks serem uma grid reversa (não existe, teria que ser um flex [o que também não ia dar certo, porisso o grid kkkkk]) pra scrollarem na direção "correta" automáticamente quando tiverem novos conteúdos dentro
-  const scrollStacks = () => {
-    if(defenseStackRef.current && attackStackRef.current) {
-      console.log('rodei')
-      defenseStackRef.current.scroll(defenseStackRef.current.scrollWidth, 0)
-      attackStackRef.current.scroll(attackStackRef.current.scrollWidth, 0)
-    }
-  }
+  const handleCardPlacement = useCallback((card: CardData) => {
+    lockStance()
+    setCard(card.id)
+    setSelectedCard(undefined)
+  },[lockStance, setCard])
 
-  //TODO pedir as cartas com os sockets
   const handleCardClick = (card: CardData) => {
     openModal({
       borderColor: card.borderColor,
@@ -46,8 +49,36 @@ export default function Game() {
   }
 
   useEffect(() => {
-    setDeck(mockCards.map((card) => ({...card, borderColor: 'primary-light', selected: card.id === selectedCard?.id})))
+    setDeck((current) => {
+      if(!current) return current
+      return gameData.hand.map(({card, id}) => ({borderColor: 'primary-light', src: `http://localhost/cardImage/${card}`, id}))
+    })
+  },[gameData.hand])
+
+  useEffect(() => {
+    setDeck((current) => {
+      if(!current) return current
+      return current.map((card) => ({...card, borderColor: 'primary-light', selected: card.id === selectedCard?.id}))
+    })
   },[selectedCard])
+
+  useEffect(() => {
+    if(!localDeck) {
+      router.push('/')
+    }
+    if(router.isReady && router.query.gameId) {
+      //TODO localdeck pode trocar
+      joinRoom(JSON.stringify({room: router.query.gameId.toString(), deck: localDeck}))
+    }
+  },[joinRoom, localDeck, router])
+
+  if(!deck) {
+    return (
+      <Layout>
+        <Loading/>
+      </Layout>
+    )
+  }
 
   return (
     <Layout>
@@ -60,8 +91,8 @@ export default function Game() {
             onCardClick={(card) => handleCardClick(card)}
             gutterMultiplication={25}
             reverse
-            selectedCard={selectedCard}
-            onCardPlacement={() => setSelectedCard(undefined)}
+            selectedCard={gameData.stance === 'attack' ? selectedCard : undefined}
+            onCardPlacement={handleCardPlacement}
           />
           <StackedCards
             ref={defenseStackRef}
@@ -69,8 +100,8 @@ export default function Game() {
             onCardClick={(card) => handleCardClick(card)}
             gutterMultiplication={25}
             reverse
-            selectedCard={selectedCard}
-            onCardPlacement={() => setSelectedCard(undefined)}
+            selectedCard={gameData.stance === 'defense' ? selectedCard : undefined}
+            onCardPlacement={handleCardPlacement}
           />
           {/**
            * //TODO setinha da alegria aqui se tiver uma carta selecionada (pro cara decidir a pilha) 

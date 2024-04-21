@@ -51,6 +51,29 @@ body.crt::before {
   pointer-events: none;
 }
 
+@keyframes loading {
+  0% {
+    visibility: hidden;
+  }
+  100% {
+    visibility: visible;
+  }
+}
+
+.loading-dots > div {
+  animation: loading 0.8s steps(4) infinite alternate;
+}
+
+.loading-dots div:nth-of-type(1) {
+  animation-delay: 0.2s;
+}
+.loading-dots div:nth-of-type(2) {
+  animation-delay: 0.4s;
+}
+.loading-dots div:nth-of-type(3) {
+  animation-delay: 0.6s;
+}
+
 .Toastify__close-button {
   display: none !important;
 }

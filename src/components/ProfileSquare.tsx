@@ -1,4 +1,4 @@
-import { TripleBorder, TripleBorderProps } from "./TripleBorder";
+import { TripleBorder, type TripleBorderProps } from "./TripleBorder";
 
 export function ProfileSquare({src, className, borderColor = 'primary-light', reverse = false} : {src: string, className?: string, reverse?: boolean} & Pick<TripleBorderProps, 'borderColor'>) {
   return (

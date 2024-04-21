@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import { Palette, PickEndsWith, hexToRgb, pixelBorder } from "@/utils";
+import { Palette, PickEndsWith, hexToRgb, pixelBorder } from "@/utils/any";
 
 type LightColors = keyof PickEndsWith<typeof Palette, '-light'>
 

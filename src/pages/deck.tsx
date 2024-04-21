@@ -1,12 +1,13 @@
 import axios from "axios"
+import Link from "next/link"
+import { env } from "process"
 import { Card } from "@/components/Card"
 import { Layout } from "@/layout"
 import { GetServerSideProps } from "next"
-import { env } from "process"
-import { MouseEvent, useCallback, useState } from "react"
+import { MouseEvent, useCallback, useEffect, useState } from "react"
 import { TripleBorder } from "@/components/TripleBorder"
-import { useSocket } from "@/hooks/useSocket"
-import Link from "next/link"
+import { useLocalStorage } from "@/hooks/useLocalStorage"
+import { errorToast } from "@/utils/toast"
 
 type BackendCard = {
   key: string
@@ -23,13 +24,13 @@ export const getServerSideProps = (async (context) => {
 
   return {
     props: {
-      cards
+      cards: cards.map((card: any) => ({...card, src: `${env.NEXT_PUBLIC_API_URL}${card.src}`}))
     }
   }
 }) satisfies GetServerSideProps<ServerSidePropsResult>
 
 export default function Deck({ cards }: ServerSidePropsResult) {
-  const { saveDeck } = useSocket()
+  const { postLocalDeck, localDeck } = useLocalStorage()
   const [addMode, setAddMode] = useState<'add' | 'remove'>();
   const [deck, setDeck] = useState<string[]>([])
 
@@ -67,9 +68,15 @@ export default function Deck({ cards }: ServerSidePropsResult) {
   }, [updateDeck]);
 
   const postDeck = useCallback(() => {
-    if (deck.length !== 20) return
-    saveDeck(deck)
-  }, [deck, saveDeck])
+    if(deck.length !== 20) return errorToast('Selecione 20 cartas!')
+    postLocalDeck(deck, true)
+  },[deck, postLocalDeck])
+
+  useEffect(() => {
+    if(localDeck && localDeck.length === 20) {
+      setDeck(localDeck)
+    }
+  },[localDeck])
 
   return (
     <Layout>
@@ -87,21 +94,21 @@ export default function Deck({ cards }: ServerSidePropsResult) {
         </div>
         <div className="flex flex-wrap gap-4 w-full mx-auto pt-2 md:pt-0 md:overflow-y-visible overflow-y-scroll">
           {(cards.sort((a, b) => (a.value ?? 0) - (b.value ?? 0))).map((card, i) => (
-            <div key={`${card.src}-deck-card`} onClick={() => addCard(card.key, card.limit)} onContextMenu={(e) => removeCard(e, card.key, card.limit)} className={`h-[6.75rem] select-none cursor-pointer relative ${deck.filter((cardKey) => cardKey === card.key).length > 0 ? '' : 'opacity-45'}`}>
+            <div key={`${card.key}-deck-card`} onClick={() => addCard(card.key, card.limit)} onContextMenu={(e) => removeCard(e, card.key, card.limit)} className={`h-[6.75rem] select-none cursor-pointer relative ${deck.filter((cardKey) => cardKey === card.key).length > 0 ? '' : 'opacity-45'}`}>
               {deck.filter((cardKey) => cardKey === card.key).length > 0 && <div className="absolute top-0 right-0 rounded-full flex items-center justify-center w-8 h-8 border-black border-2 bg-white translate-x-1/2 -translate-y-1/4">{deck.filter((cardKey) => cardKey === card.key).length}</div>}
-              <Card card={{ borderColor: 'primary-light', id: i.toString(), src: `${env.NEXT_PUBLIC_API_URL}${card.src}` }} className="w-[3.625rem] h-[6.75rem]" />
+              <Card card={{ borderColor: 'primary-light', id: i.toString(), src: card.src}} className="w-[3.625rem] h-[6.75rem]" />
             </div>
           ))}
         </div>
         <div className="w-full h-full flex items-end justify-start mt-6">
           <TripleBorder borderColor="gray-light" className="select-none h-full w-full">
-            <div onClick={postDeck} className={`${deck.length === 20 ? '' : 'pointer-events-none opacity-40'} group px-3 pr-6 py-3 pt-6 w-fit cursor-pointer`}>
+            <div onClick={postDeck} className={`${deck.length === 20 ? 'group' : 'cursor-auto opacity-40'} px-3 pr-6 py-3 pt-6 w-fit cursor-pointer`}>
               <span className="group-hover:visible invisible mr-1">*</span>
               <span>Salvar</span>
             </div>
             <Link href={"/"} className="group px-3 pr-6 py-5 w-fit cursor-pointer">
               <span className="group-hover:visible invisible mr-1">*</span>
-              <span>Cancelar</span>
+              <span>Voltar</span>
             </Link>
           </TripleBorder>
         </div>

@@ -1,3 +1,4 @@
+import { PlayerDeck } from "@/components/PlayerDeck";
 import { Layout } from "@/layout";
 
 const borders = [
@@ -14,6 +15,7 @@ export default function Test() {
   return (
     <Layout style={{background: "url('/space.png')"}}>
       <div className="w-full h-full relative">
+      <PlayerDeck playerSrc="/bowgor80.png" rival/>
         <div className="w-full h-full translate-x-[calc(50%+24px)] translate-y-9 relative">
           {borders.map((offset) => (
             <span style={{fontSize: size, lineHeight: size, width: size, height: size}} key={offset} className={`absolute ${offset} -translate-y-1/2 -translate-x-full`}>{content}</span>
