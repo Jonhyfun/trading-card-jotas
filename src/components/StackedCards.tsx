@@ -1,4 +1,4 @@
-import { ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useState } from "react"
+import { Dispatch, ForwardedRef, MutableRefObject, SetStateAction, forwardRef, useCallback, useEffect, useState } from "react"
 import { Card } from "./Card"
 import { TripleBorderProps } from "./TripleBorder"
 
@@ -11,7 +11,7 @@ export type CardData = {
 }
 
 type StackedCardsProps = {
-  cards: CardData[]
+  cardState: [CardData[], Dispatch<SetStateAction<CardData[]>>]
   gutterMultiplication?: number
   reverse?: boolean
   selectedCard?: CardData
@@ -19,8 +19,8 @@ type StackedCardsProps = {
   onCardClick?: (card: CardData) => void
 }
 
-export const StackedCards = forwardRef(({cards: _cards, onCardClick, onCardPlacement, selectedCard, reverse = false} : StackedCardsProps, ref: ForwardedRef<HTMLOListElement>) => {
-  const [cards, setCards] = useState(_cards)
+export const StackedCards = forwardRef(({cardState, onCardClick, onCardPlacement, selectedCard, reverse = false} : StackedCardsProps, ref: ForwardedRef<HTMLOListElement>) => {
+  const [cards, setCards] = cardState
   const [hoveredCardId, setHoveredCardId] = useState<CardData['id'] | undefined>()
 
   const handleCardPlacement = useCallback(() => {
@@ -28,7 +28,7 @@ export const StackedCards = forwardRef(({cards: _cards, onCardClick, onCardPlace
       setCards((current) => ([...current, selectedCard]))
       if(onCardPlacement) onCardPlacement(selectedCard)
     }
-  },[onCardPlacement, selectedCard])
+  },[onCardPlacement, selectedCard, setCards])
 
   useEffect(() => {
     //? O ref ta vindo de fora por que acho que embreve ele vai triggar esse scroll em resposta à uma mensagem do socket.
@@ -39,21 +39,21 @@ export const StackedCards = forwardRef(({cards: _cards, onCardClick, onCardPlace
   },[ref, selectedCard])
   
   return (
-    <ol ref={ref} style={{gridAutoFlow: 'column', gridTemplateColumns: 'repeat(auto-fit, minmax(78px, 78px))'}} className="grid gap-0.5 overflow-x-auto">
-      {(cards ?? []).map((card, i) => (
+    <ol ref={ref} style={{gridAutoFlow: 'column'}} className="grid grid-cols-[repeat(auto-fit,_minmax(3.875rem,_3.875rem))] md:grid-cols-[repeat(auto-fit,_minmax(4.875rem,_4.875rem))] gap-0.5 overflow-x-auto w-full">
+      {cards.map((card, i) => (
         <li key={`${card.id}-stack-${reverse}-${card.borderColor}`} onMouseEnter={() => setHoveredCardId(card.id)} onMouseLeave={() => setHoveredCardId(undefined)} className={`cursor-pointer ${(hoveredCardId !== undefined && hoveredCardId !== card.id) ? 'opacity-25' : ''}`}>
-          <button className="h-[6.75rem]" onClick={onCardClick ? () => onCardClick(card) : undefined}>
-            <Card borderColor={card.borderColor} card={card} className="w-[3.625rem] h-[6.75rem]"/>
+          <button className="w-[3.875rem] h-[5.325rem] md:w-[4.875rem] md:h-[6.75rem]" onClick={onCardClick ? () => onCardClick(card) : undefined}>
+            <Card borderColor={card.borderColor} card={card}/>
           </button>
         </li>
       ))}
       {selectedCard && (
-        <li className="h-[6.75rem] group relative">
+        <li className="w-[3.875rem] md:w-[4.875rem] h-[5.325rem] md:h-[6.75rem] group relative">
           <li
-            className="absolute top-0 left-0 border-dashed border-2 w-[4.875rem] h-[6.75rem] bg-bg-internal bg-opacity-45 cursor-pointer"
+            className="absolute top-0 left-0 border-dashed border-2 w-[3.875rem] h-[5.325rem] md:w-[4.875rem] md:h-[6.75rem] bg-bg-internal bg-opacity-45 cursor-pointer"
           />
-          <button onClick={handleCardPlacement} className="absolute top-0 left-0 h-[6.75rem] invisible group-hover:visible opacity-45">
-            <Card borderColor={selectedCard.borderColor} card={selectedCard} className="w-[3.625rem] h-[6.75rem]"/>
+          <button onClick={handleCardPlacement} className="absolute top-0 left-0 w-[3.875rem] h-[5.325rem] md:w-[4.875rem] md:h-[6.75rem] invisible group-hover:visible opacity-45">
+            <Card borderColor={selectedCard.borderColor} card={selectedCard} className="w-full"/>
           </button>
         </li>
       )}

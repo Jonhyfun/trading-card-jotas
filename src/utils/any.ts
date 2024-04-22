@@ -61,25 +61,25 @@ export const Palette = {
   "gray-light": '#c2c2a6',
 }
 
-export const mockCards: Omit<CardData, 'borderColor'>[] = [
-  {
-    id: '1',
-    src: 'http://localhost/cardImage/two.png',
-  },
-  {
-    id: '2',
-    src: 'http://localhost/cardImage/minus.png',
-  },
-  {
-    id: '3',
-    src: 'http://localhost/cardImage/x.png',
-  },
-  {
-    id: '4',
-    src: 'http://localhost/cardImage/exclamation.png',
-  },
-  {
-    id: '5',
-    src: 'http://localhost/cardImage/interrogation.png',
-  },
-]
+// export const mockCards: Omit<CardData, 'borderColor'>[] = [
+//   {
+//     id: '1',
+//     src: 'http://localhost/cardImage/two.png',
+//   },
+//   {
+//     id: '2',
+//     src: 'http://localhost/cardImage/minus.png',
+//   },
+//   {
+//     id: '3',
+//     src: 'http://localhost/cardImage/x.png',
+//   },
+//   {
+//     id: '4',
+//     src: 'http://localhost/cardImage/exclamation.png',
+//   },
+//   {
+//     id: '5',
+//     src: 'http://localhost/cardImage/interrogation.png',
+//   },
+// ]

@@ -5,12 +5,10 @@ import { Layout } from '@/layout';
 import { useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { makeId } from '@/utils/any';
-import { useGameSocket } from '@/hooks/useGameSocket';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 export default function Home() {
   const router = useRouter()
-  const socket = useGameSocket()
   const { localDeck } = useLocalStorage()
 
   const createGame = useCallback(() => {

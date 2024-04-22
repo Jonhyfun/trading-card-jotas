@@ -8,9 +8,13 @@ type ServerCard = {
   id: string
 }
 
-type GameData = {
+type GameData = { //TODO atualizar todos esses num único incoming (eu não sou burro só tava com pressa pra ter o primeiro MVP)
   stance: 'attack' | 'defense' | 'pending' | null
   hand: ServerCard[]
+  myStack: ServerCard[] //TODO um objeto de my e other ao invez de varias props "repetidas"
+  otherStack: ServerCard[]
+  myPoints: string //? é uma string por que é só um valor x que vem do banco, pode ter um - pode ter algum simbolo vai saber, da pra brincar.
+  otherPoints: string //? é uma string por que é só um valor x que vem do banco, pode ter um - pode ter algum simbolo vai saber, da pra brincar.
 }
 
 const websocketAtom = atom({
@@ -20,7 +24,7 @@ const websocketAtom = atom({
 
 const gameDataAtom = atom<GameData>({
   key: 'gameData',
-  default: {stance: null, hand: []}
+  default: {stance: null, hand: [], myStack: [], otherStack: [], myPoints: '0', otherPoints: '0'}
 })
 
 const useOutcomingMessages = () => {
@@ -41,7 +45,6 @@ const useOutcomingMessages = () => {
   const joinRoom = useRecoilCallback(({snapshot}) => async (room: string) => {
     const socket = await snapshot.getPromise(websocketAtom)
     const interval = setInterval(() => {
-      console.log('rodei?')
       if(socket.OPEN) {
         socket.send(`joinRoom/${room}`)
         clearInterval(interval);
@@ -51,7 +54,6 @@ const useOutcomingMessages = () => {
 
   const fetchHand = useRecoilCallback(({snapshot}) => async () => {
     const socket = await snapshot.getPromise(websocketAtom)
-    console.log(`fetchei`)
     socket.send('fetchHand')
   },[])
   
@@ -78,6 +80,26 @@ const useIncomingMessages = () => {
     set(gameDataAtom, (current) => ({...current, hand}))
   },[])
 
+  const loadMyStack = useRecoilCallback(({set}) => (_myStack: string) => {
+    const myStack = JSON.parse(_myStack) as GameData['myStack']
+    set(gameDataAtom, (current) => ({...current, myStack}))
+  },[])
+
+  const loadOtherStack = useRecoilCallback(({set}) => (_otherStack: string) => {
+    const otherStack = JSON.parse(_otherStack) as GameData['otherStack']
+    set(gameDataAtom, (current) => ({...current, otherStack}))
+  },[])
+
+  const loadMyPoints = useRecoilCallback(({set}) => (_myPoints: string) => {
+    const myPoints = JSON.parse(_myPoints) as GameData['myPoints']
+    set(gameDataAtom, (current) => ({...current, myPoints}))
+  },[])
+
+  const loadOtherPoints = useRecoilCallback(({set}) => (_otherPoints: string) => {
+    const otherPoints = JSON.parse(_otherPoints) as GameData['otherPoints']
+    set(gameDataAtom, (current) => ({...current, otherPoints}))
+  },[])
+
   const joinedRoom = useRecoilCallback(({snapshot}) => async () => {
     const socket = await snapshot.getPromise(websocketAtom)
     socket.send('fetchHand')
@@ -87,7 +109,7 @@ const useIncomingMessages = () => {
     router.push(data.replaceAll('-','/'))
   },[router])
 
-  return { success, error, setStance, loadHand, joinedRoom, redirect }
+  return { success, error, setStance, loadHand, joinedRoom, redirect, loadMyStack, loadOtherStack, loadMyPoints, loadOtherPoints }
 }
 
 export const useGameSocket = () => {
@@ -106,7 +128,7 @@ export const useGameSocket = () => {
       const [message, ..._data] = ev.data.split('/');
       const data = _data.join('');
 
-      console.log({ message, data });
+      console.log({message, data});
 
       (incomingMessages as any)[message](data as any);
     })
