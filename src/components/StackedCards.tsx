@@ -1,6 +1,8 @@
 import { Dispatch, ForwardedRef, MutableRefObject, SetStateAction, forwardRef, useCallback, useEffect, useState } from "react"
 import { Card } from "./Card"
 import { TripleBorderProps } from "./TripleBorder"
+import { GameData } from "@/hooks/useGameSocket"
+import { errorToast } from "@/utils/toast"
 
 //todo Matematica Man
 
@@ -13,14 +15,14 @@ export type CardData = {
 
 type StackedCardsProps = {
   cardState: [CardData[], Dispatch<SetStateAction<CardData[]>>]
-  gutterMultiplication?: number
-  reverse?: boolean
+  forStance?: 'attack' | 'defense'
   selectedCard?: CardData
   onCardPlacement?: (card: CardData) => void
   onCardClick?: (card: CardData) => void
+  gameData: GameData
 }
 
-export const StackedCards = forwardRef(({cardState, onCardClick, onCardPlacement, selectedCard, reverse = false} : StackedCardsProps, ref: ForwardedRef<HTMLOListElement>) => {
+export const StackedCards = forwardRef(({cardState, onCardClick, onCardPlacement, selectedCard, gameData, forStance} : StackedCardsProps, ref: ForwardedRef<HTMLOListElement>) => {
   const [cards, setCards] = cardState
   const [hoveredCardId, setHoveredCardId] = useState<CardData['id'] | undefined>()
 
@@ -28,6 +30,9 @@ export const StackedCards = forwardRef(({cardState, onCardClick, onCardPlacement
     if(selectedCard) {
       setCards((current) => ([...current, selectedCard]))
       if(onCardPlacement) onCardPlacement(selectedCard)
+    }
+    else {
+      errorToast('Selecione sua carta primeiro!')
     }
   },[onCardPlacement, selectedCard, setCards])
 
@@ -37,25 +42,25 @@ export const StackedCards = forwardRef(({cardState, onCardClick, onCardPlacement
     if(selectedCard && stackRef.current) {
       stackRef.current.scroll(stackRef.current.scrollWidth, 0);
     }
-  },[ref, selectedCard])
+  }, [ref, selectedCard])
   
   return (
     <ol ref={ref} style={{gridAutoFlow: 'column'}} className="grid grid-cols-[repeat(auto-fit,_minmax(3.875rem,_3.875rem))] md:grid-cols-[repeat(auto-fit,_minmax(4.875rem,_4.875rem))] gap-0.5 overflow-x-auto w-full">
       {cards.map((card, i) => (
-        <li key={`${card.id}-stack-${reverse}-${card.borderColor}`} onMouseEnter={() => setHoveredCardId(card.id)} onMouseLeave={() => setHoveredCardId(undefined)} className={`cursor-pointer ${(hoveredCardId !== undefined && hoveredCardId !== card.id) ? 'opacity-25' : ''}`}>
+        <li key={`${card.id}-stack-${forStance}-${card.borderColor}`} onMouseEnter={() => setHoveredCardId(card.id)} onMouseLeave={() => setHoveredCardId(undefined)} className={`cursor-pointer ${(hoveredCardId !== undefined && hoveredCardId !== card.id) ? 'opacity-25' : ''}`}>
           <button className="w-[3.875rem] h-[5.325rem] md:w-[4.875rem] md:h-[6.75rem]" onClick={onCardClick ? () => onCardClick(card) : undefined}>
             <Card borderColor={card.borderColor} card={card}/>
           </button>
         </li>
       ))}
-      {selectedCard && (
+      {gameData.stance === forStance && (
         <li className="w-[3.875rem] md:w-[4.875rem] h-[5.325rem] md:h-[6.75rem] group relative">
-          <li
+          <div
             className="absolute top-0 left-0 border-dashed border-2 w-[3.875rem] h-[5.325rem] md:w-[4.875rem] md:h-[6.75rem] bg-bg-internal bg-opacity-45 cursor-pointer"
-          />
-          <button onClick={handleCardPlacement} className="absolute top-0 left-0 w-[3.875rem] h-[5.325rem] md:w-[4.875rem] md:h-[6.75rem] invisible group-hover:visible opacity-45">
-            <Card borderColor={selectedCard.borderColor} card={selectedCard} className="w-full"/>
-          </button>
+            />
+            <button onClick={handleCardPlacement} className="absolute top-0 left-0 w-[3.875rem] h-[5.325rem] md:w-[4.875rem] md:h-[6.75rem] invisible group-hover:visible opacity-45">
+              {selectedCard && <Card borderColor={selectedCard.borderColor} card={selectedCard} className="w-full"/>}
+            </button>
         </li>
       )}
     </ol>

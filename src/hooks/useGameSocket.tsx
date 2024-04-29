@@ -8,7 +8,7 @@ type ServerCard = {
   id: string
 }
 
-type GameData = { //TODO atualizar todos esses num único incoming (eu não sou burro só tava com pressa pra ter o primeiro MVP)
+export type GameData = { //TODO atualizar todos esses num único incoming (eu não sou burro só tava com pressa pra ter o primeiro MVP)
   stance: 'attack' | 'defense' | 'pending' | null
   hand: ServerCard[]
   myStack: ServerCard[] //TODO um objeto de my e other ao invez de varias props "repetidas"

@@ -87,12 +87,12 @@ export default function Game() {
             <ProfileSquare borderColor={"secondary-light"} className="w-16 shrink-0 col-span-1" src={'/bowgor80.png'}/>
             <StackedCards
               ref={otherStackRef}
+              gameData={gameData}
               cardState={[otherCards, setOtherCards]}
               onCardClick={(card) => openCardModal(card.cardKey, card.borderColor)}
-              gutterMultiplication={25}
-              reverse
               selectedCard={gameData.stance === 'attack' ? selectedCard : undefined}
               onCardPlacement={handleCardPlacement}
+              forStance="attack"
             />
             <span className="ml-auto">({gameData.otherPoints.toString().replace('.', ',')})</span>
           </div>
@@ -100,12 +100,12 @@ export default function Game() {
             <ProfileSquare borderColor={"primary-light"} className="w-16 shrink-0 col-span-1" src={'/indio80.png'}/>
             <StackedCards
               ref={myStackRef}
+              gameData={gameData}
               cardState={[myCards, setMyCards]}
               onCardClick={(card) => openCardModal(card.cardKey, card.borderColor)}
-              gutterMultiplication={25}
-              reverse
               selectedCard={gameData.stance === 'defense' ? selectedCard : undefined}
               onCardPlacement={handleCardPlacement}
+              forStance="defense"
             />
             <span className="ml-auto">({gameData.myPoints.toString().replace('.', ',')})</span>
           </div>
