@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loading } from "@/components/Loading";
 import { ProfileSquare } from "@/components/ProfileSquare";
+import { BackendCard } from "@/hooks/useCards";
 
 export default function Game() {
   const router = useRouter()
@@ -29,7 +30,8 @@ export default function Game() {
     setSelectedCard(undefined)
   },[lockStance, setCard])
 
-  const handleCardClick = (card: CardData) => {
+  //TODO hookar
+  const handleCardClick = (card: CardData & BackendCard) => {
     openModal({
       borderColor: card.borderColor,
       children: (
@@ -41,7 +43,7 @@ export default function Game() {
           </TripleBorder>
           <TripleBorder borderColor="gray-light">
             <span className="text-xs p-3 w-full h-[6.75rem] overflow-y-auto block leading-5 bg-bg-internal text-black">
-              Esta carta tem o efeito de fazer alguma coisa acontecer.
+              {card.desc}
             </span>
           </TripleBorder>
         </div>

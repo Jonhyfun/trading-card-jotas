@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { Palette, PickEndsWith, hexToRgb, pixelBorder } from "@/utils/any";
 
-type LightColors = keyof PickEndsWith<typeof Palette, '-light'>
+export type LightColors = keyof PickEndsWith<typeof Palette, '-light'>
 
 export type TripleBorderProps = PropsWithChildren<{
   backgroundColor?: string,

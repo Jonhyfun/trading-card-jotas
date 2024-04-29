@@ -9,6 +9,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/layout";
 import { Loading } from "@/components/Loading";
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+
+const queryClient = new QueryClient()
 
 const pixelFont = Press_Start_2P({ subsets: ["latin"], weight: ['400'] });
 
@@ -34,22 +37,24 @@ export default function App({ Component, pageProps }: AppProps) {
   })
 
   return (
-    <RecoilRoot>
-      {loading ? <Layout><Loading/></Layout> : <Component {...pageProps} />}
-      <ToastContainer
-        bodyStyle={{height: '4rem', margin: 0}}
-        toastStyle={{...pixelBorder(hexToRgb(Palette['gray-light'])!), boxShadow: `inset black 0px 0px 0px 4px, black 0px 0px 0px 4px`}}
-        bodyClassName="border-2 border-gray w-full p-0"
-        toastClassName={`${pixelFont.className} rounded-none bg-bg-internal text-sm text-black p-0 border-solid border-2 border-white`}
-        position="bottom-center"
-        autoClose={3000}
-        hideProgressBar
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        draggable
-        theme="light"
-      />
-    </RecoilRoot>
+    <QueryClientProvider client={queryClient}>
+      <RecoilRoot>
+        {loading ? <Layout><Loading/></Layout> : <Component {...pageProps} />}
+        <ToastContainer
+          bodyStyle={{height: '4rem', margin: 0}}
+          toastStyle={{...pixelBorder(hexToRgb(Palette['gray-light'])!), boxShadow: `inset black 0px 0px 0px 4px, black 0px 0px 0px 4px`}}
+          bodyClassName="border-2 border-gray w-full p-0"
+          toastClassName={`${pixelFont.className} rounded-none bg-bg-internal text-sm text-black p-0 border-solid border-2 border-white`}
+          position="bottom-center"
+          autoClose={3000}
+          hideProgressBar
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          draggable
+          theme="light"
+        />
+      </RecoilRoot>
+    </QueryClientProvider>
   )
 }

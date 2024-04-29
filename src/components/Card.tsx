@@ -2,9 +2,10 @@ import { TextPreviewIcon } from "@/icons/TextPreview";
 import { CardData } from "./StackedCards"
 import { TripleBorder, TripleBorderProps } from "./TripleBorder"
 import { pixelBorder } from "@/utils/any";
+import { BackendCard } from "@/hooks/useCards";
 
 type CardComponentProps = {
-  card: CardData
+  card: CardData & BackendCard
   borderColor?: TripleBorderProps['borderColor']
   className?: string
   facingDown?: boolean
