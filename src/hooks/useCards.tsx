@@ -1,7 +1,7 @@
 import axios from "axios"
 import { useEffect } from "react"
 import { useQuery } from "react-query"
-import { atom, useRecoilCallback } from "recoil"
+import { atom, useRecoilCallback, useRecoilValue } from "recoil"
 
 export type BackendCard = {
   key: string
@@ -12,22 +12,39 @@ export type BackendCard = {
   src: string
 }
 
-const cardsAtom = atom<BackendCard[]>({
+const cardsAtom = atom<{cards: BackendCard[], isCardsLoading: boolean}>({
   key: 'cardsAtom',
-  default: []
+  default: {cards: [], isCardsLoading: true}
 })
 
 export const useCards = () => {
-  const { isLoading, error, data } = useQuery<BackendCard[]>('repoData', () => axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cards`).then(({data}) => data))
+  const cards = useRecoilValue(cardsAtom)
+
+  return cards
+}
+
+export const useCardsLoad = () => {
+  const { isLoading, error, data } = useQuery<BackendCard[]>('repoData', () => axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cards`).then(({data}) => data),
+  {
+    staleTime: 1000 * 60 * 60, // 1 hour in ms
+    cacheTime: 1000 * 60 * 60, // 1 hour in ms
+  })
 
   const loadCards = useRecoilCallback(({set}) => (cards: BackendCard[]) => {
-    set(cardsAtom, () => cards)
+    set(cardsAtom, (current) => ({...current, cards}))
+  },[])
+
+  const setLoading = useRecoilCallback(({set}) => (isCardsLoading: boolean) => {
+    set(cardsAtom, (current) => ({...current, isCardsLoading}))
   },[])
 
   useEffect(() => {
-    console.log('rodei')
     loadCards(data ?? [])
   },[data, loadCards])
+
+  useEffect(() => {
+    setLoading(isLoading)
+  },[isLoading, setLoading])
 
   return {
     cardsLoading: isLoading,

@@ -5,7 +5,7 @@ import { pixelBorder } from "@/utils/any";
 import { BackendCard } from "@/hooks/useCards";
 
 type CardComponentProps = {
-  card: CardData & BackendCard
+  card: CardData
   borderColor?: TripleBorderProps['borderColor']
   className?: string
   facingDown?: boolean

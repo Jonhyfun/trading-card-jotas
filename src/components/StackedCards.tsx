@@ -5,9 +5,10 @@ import { TripleBorderProps } from "./TripleBorder"
 //todo Matematica Man
 
 export type CardData = {
+  cardKey: string
   src: string
   id: string
-  borderColor: TripleBorderProps['borderColor']
+  borderColor: Exclude<TripleBorderProps['borderColor'], undefined>
 }
 
 type StackedCardsProps = {

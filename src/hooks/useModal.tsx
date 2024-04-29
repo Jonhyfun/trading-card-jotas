@@ -1,5 +1,5 @@
 import { TripleBorder, TripleBorderProps } from "@/components/TripleBorder"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { atom, useRecoilCallback, useRecoilValue } from "recoil"
 
 const modalAtom = atom<{open: boolean, modalContentProps: TripleBorderProps}>({

@@ -1,20 +1,19 @@
 import { Card } from "@/components/Card";
 import { DeckCards, PlayerDeck } from "@/components/PlayerDeck";
 import { CardData, StackedCards } from "@/components/StackedCards";
-import { TripleBorder } from "@/components/TripleBorder";
-import { useModal } from "@/hooks/useModal";
 import { useGameSocket } from "@/hooks/useGameSocket";
 import { Layout } from "@/layout";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loading } from "@/components/Loading";
 import { ProfileSquare } from "@/components/ProfileSquare";
-import { BackendCard } from "@/hooks/useCards";
+import { useCardModal } from "@/hooks/useCardModal";
 
 export default function Game() {
   const router = useRouter()
-  const { joinRoom, lockStance, setCard, gameData } = useGameSocket();
-  const { openModal } = useModal()
+  const { openCardModal } = useCardModal()
+  const { joinRoom, lockStance, placeCard, gameData } = useGameSocket();
+  
   const [selectedCard, setSelectedCard] = useState<CardData>()
   const [deck, setDeck] = useState<DeckCards | null>(null)
   
@@ -26,50 +25,29 @@ export default function Game() {
 
   const handleCardPlacement = useCallback((card: CardData) => {
     lockStance()
-    setCard(card.id)
+    placeCard(card.id)
     setSelectedCard(undefined)
-  },[lockStance, setCard])
-
-  //TODO hookar
-  const handleCardClick = (card: CardData & BackendCard) => {
-    openModal({
-      borderColor: card.borderColor,
-      children: (
-        <div className="w-[16rem] h-[20rem] p-2 pt-4 flex flex-col items-center gap-5 bg-gray">
-          <TripleBorder borderColor="gray-light">
-            <div className="w-32 h-32 bg-bg-internal flex justify-center items-center text-2xl">
-              <img className="w-full h-full" style={{imageRendering: 'pixelated'}} src={card.src}/>
-            </div>
-          </TripleBorder>
-          <TripleBorder borderColor="gray-light">
-            <span className="text-xs p-3 w-full h-[6.75rem] overflow-y-auto block leading-5 bg-bg-internal text-black">
-              {card.desc}
-            </span>
-          </TripleBorder>
-        </div>
-      )
-    })
-  }
+  },[lockStance, placeCard])
 
   useEffect(() => {
-    setDeck((gameData.hand ?? []).map(({card, id}) => ({id, borderColor: 'primary-light', src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${card}`})))
+    setDeck((gameData.hand ?? []).map(({cardKey, id}) => ({id, cardKey, borderColor: 'primary-light', src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`})))
   },[gameData.hand])
 
   useEffect(() => {
-    setMyCards(gameData.myStack.map(({card, id}) => (
-      {id, src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${card}`, borderColor: 'primary-light'}
+    setMyCards(gameData.myStack.map(({cardKey, id}) => (
+      {id, cardKey, src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`, borderColor: 'primary-light'}
     )))
   },[gameData.myStack])
 
   useEffect(() => {
-    myStackRef.current?.scroll(myStackRef.current?.scrollWidth, 0);
-  },[myCards])
-
-  useEffect(() => {
-    setOtherCards(gameData.otherStack.map(({card, id}) => (
-      {id, src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${card}`, borderColor: 'secondary-light'}
+    setOtherCards(gameData.otherStack.map(({cardKey, id}) => (
+      {id, cardKey, src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`, borderColor: 'secondary-light'}
     )))
   },[gameData.otherStack])
+  
+  useEffect(() => {
+    myStackRef.current?.scroll(myStackRef.current?.scrollWidth, 0);
+  },[myCards])
 
   useEffect(() => {
     otherStackRef.current?.scroll(otherStackRef.current?.scrollWidth, 0);
@@ -84,7 +62,6 @@ export default function Game() {
 
   useEffect(() => {
     const deck = JSON.parse(window.localStorage.getItem('deck') ?? '[]')
-    console.log({deck})
     if(deck.length !== 20) {
       router.push('/')
     }
@@ -111,7 +88,7 @@ export default function Game() {
             <StackedCards
               ref={otherStackRef}
               cardState={[otherCards, setOtherCards]}
-              onCardClick={(card) => handleCardClick(card)}
+              onCardClick={(card) => openCardModal(card.cardKey, card.borderColor)}
               gutterMultiplication={25}
               reverse
               selectedCard={gameData.stance === 'attack' ? selectedCard : undefined}
@@ -124,7 +101,7 @@ export default function Game() {
             <StackedCards
               ref={myStackRef}
               cardState={[myCards, setMyCards]}
-              onCardClick={(card) => handleCardClick(card)}
+              onCardClick={(card) => openCardModal(card.cardKey, card.borderColor)}
               gutterMultiplication={25}
               reverse
               selectedCard={gameData.stance === 'defense' ? selectedCard : undefined}
@@ -138,7 +115,7 @@ export default function Game() {
         </div>
         <div className="w-full flex items-start justify-end mb-2">
           {selectedCard && (
-            <div onClick={() => handleCardClick(selectedCard)} className="h-[4.875rem] md:h-[6.75rem] cursor-pointer">
+            <div onClick={() => openCardModal(selectedCard.cardKey, selectedCard.borderColor)} className="h-[4.875rem] md:h-[6.75rem] cursor-pointer">
               <Card card={selectedCard} className="w-[2.356rem] h-[4.875rem] md:w-[3.625rem] md:h-[6.75rem]"/>
             </div>
           )}

@@ -4,7 +4,7 @@ import { useCallback, useEffect } from "react"
 import { atom, useRecoilCallback, useRecoilValue } from "recoil"
 
 type ServerCard = {
-  card: string
+  cardKey: string
   id: string
 }
 
@@ -35,7 +35,7 @@ const useOutcomingMessages = () => {
     }
   },[])
 
-  const setCard = useRecoilCallback(({snapshot}) => async (card: string) => {
+  const placeCard = useRecoilCallback(({snapshot}) => async (card: string) => {
     const socket = await snapshot.getPromise(websocketAtom)
     if(socket.OPEN) {
       socket.send(`setCard/${card}`)
@@ -57,7 +57,7 @@ const useOutcomingMessages = () => {
     socket.send('fetchHand')
   },[])
   
-  return { saveDeck, setCard, joinRoom, fetchHand }
+  return { saveDeck, placeCard, joinRoom, fetchHand }
 }
 
 const useIncomingMessages = () => {
@@ -116,7 +116,7 @@ export const useGameSocket = () => {
   const socket = useRecoilValue(websocketAtom)
   const gameData = useRecoilValue(gameDataAtom)
 
-  const { joinRoom, saveDeck, setCard } = useOutcomingMessages()
+  const { joinRoom, saveDeck, placeCard } = useOutcomingMessages()
   const incomingMessages = useIncomingMessages()
 
   const lockStance = useRecoilCallback(({set}) => () => {
@@ -128,8 +128,6 @@ export const useGameSocket = () => {
       const [message, ..._data] = ev.data.split('/');
       const data = _data.join('');
 
-      console.log({message, data});
-
       (incomingMessages as any)[message](data as any);
     })
   },[incomingMessages, socket])
@@ -138,7 +136,7 @@ export const useGameSocket = () => {
     saveDeck,
     joinRoom,
     lockStance,
-    setCard,
+    placeCard,
     gameData
   }
 }

@@ -6,8 +6,7 @@ import { LightColors, TripleBorder } from "@/components/TripleBorder"
 import { useLocalStorage } from "@/hooks/useLocalStorage"
 import { errorToast } from "@/utils/toast"
 import { BackendCard, useCards } from "@/hooks/useCards"
-import { CardData } from "@/components/StackedCards"
-import { useModal } from "@/hooks/useModal"
+import { useCardModal } from "@/hooks/useCardModal"
 
 const addModes = {
   'add': 'Adicionar',
@@ -22,19 +21,11 @@ const addModesColors: {[key in keyof typeof addModes]: LightColors} = {
 }
 
 export default function Deck() {
-  const { openModal } = useModal()
+  const { openCardModal } = useCardModal()
   const { postLocalDeck, localDeck } = useLocalStorage()
   const [addMode, setAddMode] = useState<(keyof typeof addModes)[]>(['add', 'info', 'remove']);
   const [deck, setDeck] = useState<string[]>([])
-  const { cards, cardsLoading } = useCards()
-
-  useEffect(() => {
-    console.log({cards})
-  },[cards])
-
-  useEffect(() => {
-    console.log({addMode})
-  },[addMode])
+  const { cards, isCardsLoading } = useCards()
 
   const toggleAddMode = useCallback(() => {
     setAddMode((current) => {
@@ -64,30 +55,9 @@ export default function Deck() {
     }
   }, [deck.length]);
 
-    //TODO hookar
-    const handleCardInfo = useCallback((card: CardData & BackendCard) => {
-      openModal({
-        borderColor: card.borderColor,
-        children: (
-          <div className="w-[16rem] h-[20rem] p-2 pt-4 flex flex-col items-center gap-5 bg-gray">
-            <TripleBorder borderColor="gray-light">
-              <div className="w-32 h-32 bg-bg-internal flex justify-center items-center text-2xl">
-                <img className="w-full h-full" style={{imageRendering: 'pixelated'}} src={card.src}/>
-              </div>
-            </TripleBorder>
-            <TripleBorder className="w-full" borderColor="gray-light">
-              <span className="text-xs p-3 w-full h-[6.75rem] overflow-y-auto block leading-5 bg-bg-internal text-black">
-                {card.desc}
-              </span>
-            </TripleBorder>
-          </div>
-        )
-      })
-    },[openModal])
-
-  const addCard = useCallback((card: CardData & BackendCard) => {
+  const addCard = useCallback((card: BackendCard) => {
     if(addMode[0] === 'info') {
-      handleCardInfo({...card, src: `${process.env.NEXT_PUBLIC_API_URL}${card.src}`})
+      openCardModal(card.key, 'primary-light')
       return
     }
 
@@ -96,7 +66,7 @@ export default function Deck() {
     } else {
       updateDeck(card.key, card.limit, 'add');
     }
-  }, [addMode, handleCardInfo, updateDeck]);
+  }, [addMode, openCardModal, updateDeck]);
 
   const removeCard = useCallback((e: MouseEvent<HTMLDivElement> | null, cardKey: string, limit: number) => {
     e?.preventDefault();
@@ -129,10 +99,10 @@ export default function Deck() {
           </span>
         </div>
         <div className="flex flex-wrap gap-4 w-full mx-auto pt-2 md:pt-0 md:overflow-y-visible overflow-y-scroll">
-          {cardsLoading ? [] : ([...cards!].sort((a, b) => (a.value ?? 0) - (b.value ?? 0))).map((card, i) => (
+          {isCardsLoading ? [] : ([...cards!].sort((a, b) => (a.value ?? 0) - (b.value ?? 0))).map((card, i) => (
             <div key={`${card.key}-deck-card`} onClick={() => addCard(card)} onContextMenu={(e) => removeCard(e, card.key, card.limit)} className={`h-[6.75rem] select-none cursor-pointer relative ${deck.filter((cardKey) => cardKey === card.key).length > 0 ? '' : 'opacity-45'}`}>
               {deck.filter((cardKey) => cardKey === card.key).length > 0 && <div className="absolute top-0 right-0 rounded-full flex items-center justify-center w-8 h-8 border-black border-2 bg-white translate-x-1/2 -translate-y-1/4">{deck.filter((cardKey) => cardKey === card.key).length}</div>}
-              <Card card={{  ...card, borderColor: 'primary-light', id: i.toString(), src: `${process.env.NEXT_PUBLIC_API_URL}${card.src}`}} className="w-[3.625rem] h-[6.75rem]" />
+              <Card card={{  ...card, cardKey: card.key, borderColor: 'primary-light', id: i.toString(), src: `${process.env.NEXT_PUBLIC_API_URL}${card.src}`}} className="w-[3.625rem] h-[6.75rem]" />
             </div>
           ))}
         </div>
