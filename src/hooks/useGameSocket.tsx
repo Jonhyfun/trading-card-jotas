@@ -10,6 +10,7 @@ type ServerCard = {
 
 export type GameData = { //TODO atualizar todos esses num único incoming (eu não sou burro só tava com pressa pra ter o primeiro MVP)
   stance: 'attack' | 'defense' | 'pending' | null
+  gameState: 'waitingForPlayers' | 'running' | 'victory' | 'loss'
   hand: ServerCard[]
   myStack: ServerCard[] //TODO um objeto de my e other ao invez de varias props "repetidas"
   otherStack: ServerCard[]
@@ -24,39 +25,39 @@ const websocketAtom = atom({
 
 const gameDataAtom = atom<GameData>({
   key: 'gameData',
-  default: {stance: null, hand: [], myStack: [], otherStack: [], myPoints: '0', otherPoints: '0'}
+  default: { stance: null, gameState: 'waitingForPlayers', hand: [], myStack: [], otherStack: [], myPoints: '0', otherPoints: '0' }
 })
 
 const useOutcomingMessages = () => {
-  const saveDeck = useRecoilCallback(({snapshot}) => async (deck: string[], withMessage = false) => {
+  const saveDeck = useRecoilCallback(({ snapshot }) => async (deck: string[], withMessage = false) => {
     const socket = await snapshot.getPromise(websocketAtom)
-    if(socket.OPEN) {
+    if (socket.OPEN) {
       socket.send(`${withMessage ? 'setCurrentDeckWithMessage' : 'setCurrentDeck'}/${JSON.stringify(deck)}`)
     }
-  },[])
+  }, [])
 
-  const placeCard = useRecoilCallback(({snapshot}) => async (card: string) => {
+  const placeCard = useRecoilCallback(({ snapshot }) => async (card: string) => {
     const socket = await snapshot.getPromise(websocketAtom)
-    if(socket.OPEN) {
+    if (socket.OPEN) {
       socket.send(`setCard/${card}`)
     }
-  },[])
+  }, [])
 
-  const joinRoom = useRecoilCallback(({snapshot}) => async (room: string) => {
+  const joinRoom = useRecoilCallback(({ snapshot }) => async (room: string) => {
     const socket = await snapshot.getPromise(websocketAtom)
     const interval = setInterval(() => {
-      if(socket.OPEN) {
+      if (socket.OPEN) {
         socket.send(`joinRoom/${room}`)
         clearInterval(interval);
       }
-    },300)
-  },[])
+    }, 300)
+  }, [])
 
-  const fetchHand = useRecoilCallback(({snapshot}) => async () => {
+  const fetchHand = useRecoilCallback(({ snapshot }) => async () => {
     const socket = await snapshot.getPromise(websocketAtom)
     socket.send('fetchHand')
-  },[])
-  
+  }, [])
+
   return { saveDeck, placeCard, joinRoom, fetchHand }
 }
 
@@ -65,51 +66,69 @@ const useIncomingMessages = () => {
 
   const success = useCallback((data: string) => {
     successToast(data)
-  },[])
+  }, [])
 
   const error = useCallback((data: string) => {
     errorToast(data)
-  },[])
+  }, [])
 
-  const setStance = useRecoilCallback(({set}) => (stance: GameData['stance']) => {
-    set(gameDataAtom, (current) => ({...current, stance}))
-  },[])
+  const setGameState = useRecoilCallback(({ set }) => (data: string) => {
+    set(gameDataAtom, (current) => ({ ...current, gameState: data as GameData['gameState'] }))
+  }, [])
 
-  const loadHand = useRecoilCallback(({set}) => (_hand: string) => {
+  const endLosing = useRecoilCallback(({ set }) => (data: string) => {
+    set(gameDataAtom, (current) => ({ ...current, gameState: 'loss' as GameData['gameState'] }))
+    error(data)
+  }, [error])
+
+  const endWining = useRecoilCallback(({ set }) => (data: string) => {
+    set(gameDataAtom, (current) => ({ ...current, gameState: 'victory' as GameData['gameState'] }))
+    success(data)
+  }, [success])
+
+  const setStance = useRecoilCallback(({ set }) => (stance: GameData['stance']) => {
+    set(gameDataAtom, (current) => ({ ...current, stance }))
+  }, [])
+
+  const loadHand = useRecoilCallback(({ set }) => (_hand: string) => {
     const hand = JSON.parse(_hand) as GameData['hand']
-    set(gameDataAtom, (current) => ({...current, hand}))
-  },[])
+    set(gameDataAtom, (current) => ({ ...current, hand }))
+  }, [])
 
-  const loadMyStack = useRecoilCallback(({set}) => (_myStack: string) => {
+  const loadMyStack = useRecoilCallback(({ set }) => (_myStack: string) => {
     const myStack = JSON.parse(_myStack) as GameData['myStack']
-    set(gameDataAtom, (current) => ({...current, myStack}))
-  },[])
+    set(gameDataAtom, (current) => ({ ...current, myStack }))
+  }, [])
 
-  const loadOtherStack = useRecoilCallback(({set}) => (_otherStack: string) => {
+  const loadOtherStack = useRecoilCallback(({ set }) => (_otherStack: string) => {
     const otherStack = JSON.parse(_otherStack) as GameData['otherStack']
-    set(gameDataAtom, (current) => ({...current, otherStack}))
-  },[])
+    set(gameDataAtom, (current) => ({ ...current, otherStack }))
+  }, [])
 
-  const loadMyPoints = useRecoilCallback(({set}) => (_myPoints: string) => {
+  const loadMyPoints = useRecoilCallback(({ set }) => (_myPoints: string) => {
     const myPoints = JSON.parse(_myPoints) as GameData['myPoints']
-    set(gameDataAtom, (current) => ({...current, myPoints}))
-  },[])
+    set(gameDataAtom, (current) => ({ ...current, myPoints }))
+  }, [])
 
-  const loadOtherPoints = useRecoilCallback(({set}) => (_otherPoints: string) => {
+  const loadOtherPoints = useRecoilCallback(({ set }) => (_otherPoints: string) => {
     const otherPoints = JSON.parse(_otherPoints) as GameData['otherPoints']
-    set(gameDataAtom, (current) => ({...current, otherPoints}))
-  },[])
+    set(gameDataAtom, (current) => ({ ...current, otherPoints }))
+  }, [])
 
-  const joinedRoom = useRecoilCallback(({snapshot}) => async () => {
+  const joinedRoom = useRecoilCallback(({ snapshot }) => async () => {
     const socket = await snapshot.getPromise(websocketAtom)
     socket.send('fetchHand')
-  },[])
+  }, [])
 
   const redirect = useCallback((data: string) => {
-    router.push(data.replaceAll('-','/'))
-  },[router])
+    router.push(data.replaceAll('-', '/'))
+  }, [router])
 
-  return { success, error, setStance, loadHand, joinedRoom, redirect, loadMyStack, loadOtherStack, loadMyPoints, loadOtherPoints }
+  return {
+    success, error, setStance, loadHand, joinedRoom, redirect,
+    loadMyStack, loadOtherStack, loadMyPoints, loadOtherPoints,
+    setGameState, endLosing, endWining
+  }
 }
 
 export const useGameSocket = () => {
@@ -119,9 +138,9 @@ export const useGameSocket = () => {
   const { joinRoom, saveDeck, placeCard } = useOutcomingMessages()
   const incomingMessages = useIncomingMessages()
 
-  const lockStance = useRecoilCallback(({set}) => () => {
-    set(gameDataAtom, (current) => ({...current, stance: 'pending' as GameData['stance']}))
-  },[])
+  const lockStance = useRecoilCallback(({ set }) => () => {
+    set(gameDataAtom, (current) => ({ ...current, stance: 'pending' as GameData['stance'] }))
+  }, [])
 
   useEffect(() => {
     socket.onmessage = ((ev: MessageEvent<any>) => {
@@ -130,7 +149,7 @@ export const useGameSocket = () => {
 
       (incomingMessages as any)[message](data as any);
     })
-  },[incomingMessages, socket])
+  }, [incomingMessages, socket])
 
   return {
     saveDeck,
