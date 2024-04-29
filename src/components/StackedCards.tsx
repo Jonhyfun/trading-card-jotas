@@ -53,7 +53,7 @@ export const StackedCards = forwardRef(({cardState, onCardClick, onCardPlacement
           </button>
         </li>
       ))}
-      {gameData.stance === forStance && (
+      {(gameData.gameState === 'running' && (gameData.stance === forStance)) && (
         <li className="w-[3.875rem] md:w-[4.875rem] h-[5.325rem] md:h-[6.75rem] group relative">
           <div
             className="absolute top-0 left-0 border-dashed border-2 w-[3.875rem] h-[5.325rem] md:w-[4.875rem] md:h-[6.75rem] bg-bg-internal bg-opacity-45 cursor-pointer"
