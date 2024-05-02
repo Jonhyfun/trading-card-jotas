@@ -14,6 +14,8 @@ export type GameData = { //TODO atualizar todos esses num único incoming (eu n�
   hand: ServerCard[]
   myStack: ServerCard[] //TODO um objeto de my e other ao invez de varias props "repetidas"
   otherStack: ServerCard[]
+  visualEffects: ('overwritten')[]
+  otherVisualEffects: ('overwritten')[]
   myPoints: string //? é uma string por que é só um valor x que vem do banco, pode ter um - pode ter algum simbolo vai saber, da pra brincar.
   otherPoints: string //? é uma string por que é só um valor x que vem do banco, pode ter um - pode ter algum simbolo vai saber, da pra brincar.
 }
@@ -25,7 +27,7 @@ const websocketAtom = atom({
 
 const gameDataAtom = atom<GameData>({
   key: 'gameData',
-  default: { stance: null, gameState: 'waitingForPlayers', hand: [], myStack: [], otherStack: [], myPoints: '0', otherPoints: '0' }
+  default: { stance: null, gameState: 'waitingForPlayers', hand: [], myStack: [], otherStack: [], myPoints: '0', otherPoints: '0', visualEffects: [], otherVisualEffects: [] } //TODO depois o back juntar tudo? mesmo que de mentira, só pro front acessar um objeto no lugar de varios arrays
 })
 
 const useOutcomingMessages = () => {
@@ -105,6 +107,16 @@ const useIncomingMessages = () => {
     set(gameDataAtom, (current) => ({ ...current, otherStack }))
   }, [])
 
+  const loadVisualEffects = useRecoilCallback(({ set }) => (_visualEffects: string) => {
+    const visualEffects = JSON.parse(_visualEffects) as GameData['visualEffects']
+    set(gameDataAtom, (current) => ({ ...current, visualEffects }))
+  }, [])
+
+  const loadOtherVisualEffects = useRecoilCallback(({ set }) => (_otherVisualEffects: string) => {
+    const otherVisualEffects = JSON.parse(_otherVisualEffects) as GameData['otherVisualEffects']
+    set(gameDataAtom, (current) => ({ ...current, otherVisualEffects }))
+  }, [])
+
   const loadMyPoints = useRecoilCallback(({ set }) => (_myPoints: string) => {
     const myPoints = JSON.parse(_myPoints) as GameData['myPoints']
     set(gameDataAtom, (current) => ({ ...current, myPoints }))
@@ -127,6 +139,7 @@ const useIncomingMessages = () => {
   return {
     success, error, setStance, loadHand, joinedRoom, redirect,
     loadMyStack, loadOtherStack, loadMyPoints, loadOtherPoints,
+    loadVisualEffects, loadOtherVisualEffects,
     setGameState, endLosing, endWining
   }
 }
