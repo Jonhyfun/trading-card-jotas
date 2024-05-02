@@ -130,6 +130,7 @@ export default function Game() {
           <PlayerDeck
             playerSrc="/indio80.png"
             deckState={[deck, setDeck]} //TODO nao vai atualizar kkkkkk (melhor extrair o state, paciencia)
+            gameData={gameData}
             onCardClick={(card) => {
               setSelectedCard((current) => (current?.id === card.id ? undefined : card))
             }}
