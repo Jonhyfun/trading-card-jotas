@@ -25,9 +25,11 @@ const websocketAtom = atom({
   default: new WebSocket(process.env.NEXT_PUBLIC_SOCKET_URL!)
 })
 
+const defaultGameData: GameData = { stance: null, gameState: 'waitingForPlayers', hand: [], myStack: [], otherStack: [], myPoints: '0', otherPoints: '0', visualEffects: [], otherVisualEffects: [] }
+
 const gameDataAtom = atom<GameData>({
   key: 'gameData',
-  default: { stance: null, gameState: 'waitingForPlayers', hand: [], myStack: [], otherStack: [], myPoints: '0', otherPoints: '0', visualEffects: [], otherVisualEffects: [] } //TODO depois o back juntar tudo? mesmo que de mentira, só pro front acessar um objeto no lugar de varios arrays
+  default: defaultGameData //TODO depois o back juntar tudo? mesmo que de mentira, só pro front acessar um objeto no lugar de varios arrays
 })
 
 const useOutcomingMessages = () => {
@@ -55,12 +57,17 @@ const useOutcomingMessages = () => {
     }, 300)
   }, [])
 
+  const leaveRoom = useRecoilCallback(({ snapshot }) => async (room: string) => {
+    const socket = await snapshot.getPromise(websocketAtom)
+    socket.send(`leaveRoom/${room}`)
+  }, [])
+
   const fetchHand = useRecoilCallback(({ snapshot }) => async () => {
     const socket = await snapshot.getPromise(websocketAtom)
     socket.send('fetchHand')
   }, [])
 
-  return { saveDeck, placeCard, joinRoom, fetchHand }
+  return { saveDeck, placeCard, leaveRoom, joinRoom, fetchHand }
 }
 
 const useIncomingMessages = () => {
@@ -133,7 +140,7 @@ const useIncomingMessages = () => {
   }, [])
 
   const redirect = useCallback((data: string) => {
-    router.push(data.replaceAll('-', '/'))
+    router.push(`${router.basePath}/${data.replaceAll('-', '/')}`)
   }, [router])
 
   return {
@@ -148,11 +155,15 @@ export const useGameSocket = () => {
   const socket = useRecoilValue(websocketAtom)
   const gameData = useRecoilValue(gameDataAtom)
 
-  const { joinRoom, saveDeck, placeCard } = useOutcomingMessages()
+  const outcomingMessages = useOutcomingMessages()
   const incomingMessages = useIncomingMessages()
 
   const lockStance = useRecoilCallback(({ set }) => () => {
     set(gameDataAtom, (current) => ({ ...current, stance: 'pending' as GameData['stance'] }))
+  }, [])
+
+  const cleanup = useRecoilCallback(({ set }) => () => {
+    set(gameDataAtom, defaultGameData)
   }, [])
 
   useEffect(() => {
@@ -164,11 +175,15 @@ export const useGameSocket = () => {
     })
   }, [incomingMessages, socket])
 
+  useEffect(() => {
+    return () => {
+      cleanup();
+    }
+  }, [cleanup])
+
   return {
-    saveDeck,
-    joinRoom,
+    ...outcomingMessages,
     lockStance,
-    placeCard,
     gameData
   }
 }

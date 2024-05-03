@@ -12,7 +12,7 @@ import { useCardModal } from "@/hooks/useCardModal";
 export default function Game() {
   const router = useRouter()
   const { openCardModal } = useCardModal()
-  const { joinRoom, lockStance, placeCard, gameData } = useGameSocket();
+  const { joinRoom, lockStance, placeCard, leaveRoom, gameData } = useGameSocket();
 
   const [selectedCard, setSelectedCard] = useState<CardData>()
   const [deck, setDeck] = useState<DeckCards | null>(null)
@@ -69,6 +69,14 @@ export default function Game() {
       joinRoom(JSON.stringify({ room: router.query.gameId.toString(), deck }))
     }
   }, [joinRoom, router])
+
+  useEffect(() => {
+    return () => {
+      if (router.isReady) {
+        leaveRoom(router.query.gameId!.toString())
+      }
+    }
+  }, [leaveRoom, router.isReady, router.query.gameId])
 
   if (!deck) {
     return (
