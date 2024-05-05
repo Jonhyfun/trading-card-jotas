@@ -10,11 +10,12 @@ export type BackendCard = {
   desc?: string
   limit: 1 | 2 | 3
   src: string
+  ghost?: boolean
 }
 
-const cardsAtom = atom<{cards: BackendCard[], isCardsLoading: boolean}>({
+const cardsAtom = atom<{ cards: BackendCard[], isCardsLoading: boolean }>({
   key: 'cardsAtom',
-  default: {cards: [], isCardsLoading: true}
+  default: { cards: [], isCardsLoading: true }
 })
 
 export const useCards = () => {
@@ -24,27 +25,27 @@ export const useCards = () => {
 }
 
 export const useCardsLoad = () => {
-  const { isLoading, error, data } = useQuery<BackendCard[]>('repoData', () => axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cards`).then(({data}) => data),
-  {
-    staleTime: 1000 * 60 * 60, // 1 hour in ms
-    cacheTime: 1000 * 60 * 60, // 1 hour in ms
-  })
+  const { isLoading, error, data } = useQuery<BackendCard[]>('repoData', () => axios.get(`${process.env.NEXT_PUBLIC_API_URL}/cards`).then(({ data }) => data),
+    {
+      staleTime: 1000 * 60 * 60, // 1 hour in ms
+      cacheTime: 1000 * 60 * 60, // 1 hour in ms
+    })
 
-  const loadCards = useRecoilCallback(({set}) => (cards: BackendCard[]) => {
-    set(cardsAtom, (current) => ({...current, cards}))
-  },[])
+  const loadCards = useRecoilCallback(({ set }) => (cards: BackendCard[]) => {
+    set(cardsAtom, (current) => ({ ...current, cards }))
+  }, [])
 
-  const setLoading = useRecoilCallback(({set}) => (isCardsLoading: boolean) => {
-    set(cardsAtom, (current) => ({...current, isCardsLoading}))
-  },[])
+  const setLoading = useRecoilCallback(({ set }) => (isCardsLoading: boolean) => {
+    set(cardsAtom, (current) => ({ ...current, isCardsLoading }))
+  }, [])
 
   useEffect(() => {
     loadCards(data ?? [])
-  },[data, loadCards])
+  }, [data, loadCards])
 
   useEffect(() => {
     setLoading(isLoading)
-  },[isLoading, setLoading])
+  }, [isLoading, setLoading])
 
   return {
     cardsLoading: isLoading,

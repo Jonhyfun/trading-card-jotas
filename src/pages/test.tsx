@@ -9,11 +9,11 @@ const borders = [
 ]
 
 export default function Test() {
-  const content = 'X'
+  const content = '|'
   const size = '36rem'
 
   return (
-    <Layout style={{ background: "url('/space.png')" }}>
+    <Layout style={false ? undefined : { background: "url('/space.png')" }}>
       <div className="w-full h-full relative">
         <div className="w-full h-full translate-x-[calc(50%+24px)] translate-y-9 relative">
           {borders.map((offset) => (

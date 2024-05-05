@@ -3,6 +3,7 @@ import { Card } from "./Card"
 import { TripleBorderProps } from "./TripleBorder"
 import { GameData } from "@/hooks/useGameSocket"
 import { errorToast } from "@/utils/toast"
+import { useCards } from "@/hooks/useCards"
 
 //todo Matematica Man
 
@@ -23,6 +24,7 @@ type StackedCardsProps = {
 }
 
 export const StackedCards = forwardRef(({ cardState, onCardClick, onCardPlacement, selectedCard, gameData, forStance }: StackedCardsProps, ref: ForwardedRef<HTMLOListElement>) => {
+  const { cards: cardsData } = useCards()
   const [cards, setCards] = cardState
   const [hoveredCardId, setHoveredCardId] = useState<CardData['id'] | undefined>()
 
@@ -53,13 +55,24 @@ export const StackedCards = forwardRef(({ cardState, onCardClick, onCardPlacemen
           <button className="w-[3.875rem] h-[5.325rem] md:w-[4.875rem] md:h-[6.75rem]" onClick={onCardClick ? () => onCardClick(card) : undefined}>
             <Card borderColor={card.borderColor} card={card} />
           </button>
-          {visualEffects[i] && (
+          {cardsData.find(({ key }) => key === card.cardKey)?.ghost ? (
             <div
-              style={{ background: `url(${process.env.NEXT_PUBLIC_API_URL}/visualEffects/${visualEffects[i]}.png)` }}
+              style={{ background: `url(${process.env.NEXT_PUBLIC_API_URL}/visualEffects/ghost.png)` }}
               className="absolute bg-center bg-contain bg-no-repeat top-0 left-0 w-full h-full opacity-65"
               onClick={onCardClick ? () => onCardClick(card) : undefined}
             >
             </div>
+          ) : (
+            <>
+              {visualEffects[i] && (
+                <div
+                  style={{ background: `url(${process.env.NEXT_PUBLIC_API_URL}/visualEffects/${visualEffects[i]}.png)` }}
+                  className="absolute bg-center bg-contain bg-no-repeat top-0 left-0 w-full h-full opacity-65"
+                  onClick={onCardClick ? () => onCardClick(card) : undefined}
+                >
+                </div>
+              )}
+            </>
           )}
         </li>
       ))}
