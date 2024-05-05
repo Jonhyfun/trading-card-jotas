@@ -14,7 +14,7 @@ const addModes = {
   'info': 'Info',
 }
 
-const addModesColors: {[key in keyof typeof addModes]: LightColors} = {
+const addModesColors: { [key in keyof typeof addModes]: LightColors } = {
   'add': 'primary-light',
   'remove': 'secondary-light',
   'info': 'gray-light',
@@ -33,7 +33,7 @@ export default function Deck() {
       result.unshift(result.pop()!)
       return result
     })
-  },[])
+  }, [])
 
   const updateDeck = useCallback((cardKey: string, limit: number, mode: 'add' | 'remove' | 'info') => {
     if (mode === 'add') {
@@ -56,7 +56,7 @@ export default function Deck() {
   }, [deck.length]);
 
   const addCard = useCallback((card: BackendCard) => {
-    if(addMode[0] === 'info') {
+    if (addMode[0] === 'info') {
       openCardModal(card.key, 'primary-light')
       return
     }
@@ -74,15 +74,15 @@ export default function Deck() {
   }, [updateDeck]);
 
   const postDeck = useCallback(() => {
-    if(deck.length !== 20) return errorToast('Selecione 20 cartas!')
+    if (deck.length !== 20) return errorToast('Selecione 20 cartas!')
     postLocalDeck(deck, true)
-  },[deck, postLocalDeck])
+  }, [deck, postLocalDeck])
 
   useEffect(() => {
-    if(localDeck && localDeck.length === 20) {
+    if (localDeck && localDeck.length === 20) {
       setDeck(localDeck)
     }
-  },[localDeck])
+  }, [localDeck])
 
   return (
     <Layout>
@@ -98,15 +98,15 @@ export default function Deck() {
             {deck.length}/20
           </span>
         </div>
-        <div className="flex flex-wrap gap-4 w-full mx-auto pt-2 md:pt-0 md:overflow-y-visible overflow-y-scroll">
+        <div className="flex flex-wrap gap-4 w-full mx-auto pt-2 overflow-y-scroll">
           {isCardsLoading ? [] : ([...cards!].sort((a, b) => (a.value ?? 0) - (b.value ?? 0))).map((card, i) => (
             <div key={`${card.key}-deck-card`} onClick={() => addCard(card)} onContextMenu={(e) => removeCard(e, card.key, card.limit)} className={`h-[6.75rem] select-none cursor-pointer relative ${deck.filter((cardKey) => cardKey === card.key).length > 0 ? '' : 'opacity-45'}`}>
               {deck.filter((cardKey) => cardKey === card.key).length > 0 && <div className="absolute top-0 right-0 rounded-full flex items-center justify-center w-8 h-8 border-black border-2 bg-white translate-x-1/2 -translate-y-1/4">{deck.filter((cardKey) => cardKey === card.key).length}</div>}
-              <Card card={{  ...card, cardKey: card.key, borderColor: 'primary-light', id: i.toString(), src: `${process.env.NEXT_PUBLIC_API_URL}${card.src}`}} className="w-[3.625rem] h-[6.75rem]" />
+              <Card card={{ ...card, cardKey: card.key, borderColor: 'primary-light', id: i.toString(), src: `${process.env.NEXT_PUBLIC_API_URL}${card.src}` }} className="w-[3.625rem] h-[6.75rem]" />
             </div>
           ))}
         </div>
-        <div className="w-full h-full flex items-end justify-start mt-6">
+        <div className="w-full h-full flex items-end justify-start mt-6 max-h-[8.5rem]">
           <TripleBorder borderColor="gray-light" className="select-none h-full w-full">
             <div onClick={postDeck} className={`${deck.length === 20 ? 'group' : 'cursor-auto opacity-40'} px-3 pr-6 py-3 pt-6 w-fit cursor-pointer`}>
               <span className="group-hover:visible invisible mr-1">*</span>
