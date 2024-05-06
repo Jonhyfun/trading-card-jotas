@@ -14,8 +14,8 @@ export type GameData = { //TODO atualizar todos esses num único incoming (eu n�
   hand: ServerCard[]
   myStack: ServerCard[] //TODO um objeto de my e other ao invez de varias props "repetidas"
   otherStack: ServerCard[]
-  visualEffects: ('overwritten')[]
-  otherVisualEffects: ('overwritten')[]
+  visualEffects: ('overwritten' | 'copied' | 'ghost')[]
+  otherVisualEffects: ('overwritten' | 'copied' | 'ghost')[]
   myPoints: string //? é uma string por que é só um valor x que vem do banco, pode ter um - pode ter algum simbolo vai saber, da pra brincar.
   otherPoints: string //? é uma string por que é só um valor x que vem do banco, pode ter um - pode ter algum simbolo vai saber, da pra brincar.
 }

@@ -67,7 +67,7 @@ export const StackedCards = forwardRef(({ cardState, onCardClick, onCardPlacemen
               {visualEffects[i] && (
                 <div
                   style={{ background: `url(${process.env.NEXT_PUBLIC_API_URL}/visualEffects/${visualEffects[i]}.png)` }}
-                  className="absolute bg-center bg-contain bg-no-repeat top-0 left-0 w-full h-full opacity-65"
+                  className={`absolute bg-center bg-contain bg-no-repeat ${visualEffects[i] === 'overwritten' ? 'top-0 left-0 w-full h-full' : 'top-0 right-0 w-1/2 h-1/2'} opacity-65`}
                   onClick={onCardClick ? () => onCardClick(card) : undefined}
                 >
                 </div>
