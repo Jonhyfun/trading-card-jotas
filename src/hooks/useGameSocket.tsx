@@ -20,9 +20,9 @@ export type GameData = { //TODO atualizar todos esses num único incoming (eu n�
   otherPoints: string //? é uma string por que é só um valor x que vem do banco, pode ter um - pode ter algum simbolo vai saber, da pra brincar.
 }
 
-const websocketAtom = atom({
+export const websocketAtom = atom<WebSocket | undefined>({
   key: 'websocketAtom',
-  default: new WebSocket(process.env.NEXT_PUBLIC_SOCKET_URL!)
+  default: undefined
 })
 
 const defaultGameData: GameData = { stance: null, gameState: 'waitingForPlayers', hand: [], myStack: [], otherStack: [], myPoints: '0', otherPoints: '0', visualEffects: [], otherVisualEffects: [] }
@@ -35,23 +35,23 @@ const gameDataAtom = atom<GameData>({
 const useOutcomingMessages = () => {
   const saveDeck = useRecoilCallback(({ snapshot }) => async (deck: string[], withMessage = false) => {
     const socket = await snapshot.getPromise(websocketAtom)
-    if (socket.OPEN) {
-      socket.send(`${withMessage ? 'setCurrentDeckWithMessage' : 'setCurrentDeck'}/${JSON.stringify(deck)}`)
+    if (socket!.OPEN) {
+      socket!.send(`${withMessage ? 'setCurrentDeckWithMessage' : 'setCurrentDeck'}/${JSON.stringify(deck)}`)
     }
   }, [])
 
   const placeCard = useRecoilCallback(({ snapshot }) => async (card: string) => {
     const socket = await snapshot.getPromise(websocketAtom)
-    if (socket.OPEN) {
-      socket.send(`setCard/${card}`)
+    if (socket!.OPEN) {
+      socket!.send(`setCard/${card}`)
     }
   }, [])
 
   const joinRoom = useRecoilCallback(({ snapshot }) => async (room: string) => {
     const socket = await snapshot.getPromise(websocketAtom)
     const interval = setInterval(() => {
-      if (socket.OPEN) {
-        socket.send(`joinRoom/${room}`)
+      if (socket!.OPEN) {
+        socket!.send(`joinRoom/${room}`)
         clearInterval(interval);
       }
     }, 300)
@@ -59,12 +59,13 @@ const useOutcomingMessages = () => {
 
   const leaveRoom = useRecoilCallback(({ snapshot }) => async (room: string) => {
     const socket = await snapshot.getPromise(websocketAtom)
-    socket.send(`leaveRoom/${room}`)
+    console.log({ socket })
+    socket!.send(`leaveRoom/${room}`)
   }, [])
 
   const fetchHand = useRecoilCallback(({ snapshot }) => async () => {
     const socket = await snapshot.getPromise(websocketAtom)
-    socket.send('fetchHand')
+    socket!.send('fetchHand')
   }, [])
 
   return { saveDeck, placeCard, leaveRoom, joinRoom, fetchHand }
@@ -136,7 +137,7 @@ const useIncomingMessages = () => {
 
   const joinedRoom = useRecoilCallback(({ snapshot }) => async () => {
     const socket = await snapshot.getPromise(websocketAtom)
-    socket.send('fetchHand')
+    socket!.send('fetchHand')
   }, [])
 
   const redirect = useCallback((data: string) => {
@@ -167,6 +168,7 @@ export const useGameSocket = () => {
   }, [])
 
   useEffect(() => {
+    if (!socket) return
     socket.onmessage = ((ev: MessageEvent<any>) => {
       const [message, ..._data] = ev.data.split('/');
       const data = _data.join('');

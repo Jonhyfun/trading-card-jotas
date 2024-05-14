@@ -1,27 +1,71 @@
 import "@/styles/globals.css";
 import 'react-toastify/dist/ReactToastify.css';
 import type { AppProps } from "next/app";
-import { RecoilRoot } from "recoil";
+import { RecoilRoot, useRecoilCallback } from "recoil";
 import { Palette, hexToRgb, pixelBorder } from "@/utils/any";
 import { ToastContainer } from 'react-toastify';
 import { Press_Start_2P } from "next/font/google";
-import { useLayoutEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Layout } from "@/layout";
 import { Loading } from "@/components/Loading";
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { useCardsLoad } from "@/hooks/useCards";
+import { useAuthRegister } from "@/hooks/useAuth";
+import { websocketAtom } from "@/hooks/useGameSocket";
+import { auth } from "@/utils/firebase";
 
 const queryClient = new QueryClient()
 
 const pixelFont = Press_Start_2P({ subsets: ["latin"], weight: ['400'] });
 
-function AppContent({ Component, loading, pageProps }: { loading: boolean } & AppProps) {
+function AppContent({ Component, loadingState, pageProps, ...otherAppProps }: { loadingState: [boolean, Dispatch<SetStateAction<boolean>>] } & AppProps) {
+  const user = useAuthRegister({ Component, pageProps, ...otherAppProps });
+  const [loading, setLoading] = loadingState
+  const [error, setError] = useState(false)
   useCardsLoad();
+
+  const handleInitialSocket = useRecoilCallback(({ set, snapshot }) => async () => {
+    setLoading(true)
+    if (!user) return
+    console.log({ user })
+    const token = await auth.currentUser!.getIdToken()
+    const currentSocket = await snapshot.getPromise(websocketAtom)
+    if (currentSocket) currentSocket.close();
+
+
+    const newSocket = new WebSocket(process.env.NEXT_PUBLIC_SOCKET_URL!, token)
+    newSocket.onopen = () => setLoading(false)
+    newSocket.onerror = () => setError(true)
+    newSocket.onclose = newSocket.onerror
+
+    set(websocketAtom, newSocket)
+  }, [setLoading, user])
+
+  useEffect(() => {
+    handleInitialSocket()
+  }, [handleInitialSocket])
+
+  useEffect(() => {
+    if (error) {
+      setTimeout(() => {
+        document.getElementById("cadeira")!.style.filter = 'invert(1)'
+      }, 1000)
+    }
+  }, [error])
 
   return (
     <>
-      {loading ? <Layout><Loading /></Layout> : <Component {...pageProps} />}
+      {error ? (
+        <div className="w-screen h-screen bg-bg-internal font-medium text-black flex flex-col gap-2 text-center p-3 justify-center items-center">
+          <img id="cadeira" width={200} height={200} className="rotate-[900deg] transition-all duration-1000" src="/cadeira.jpg" />
+          <span>Servidor offline ou em manutenção. Tente novamente mais tarde.</span>
+        </div>
+      ) : (
+        <>
+          {((loading || typeof user === 'undefined')) ? <Layout><Loading /></Layout> : <Component {...pageProps} />}
+        </>
+      )}
       <ToastContainer
         bodyStyle={{ height: '4rem', margin: 0 }}
         toastStyle={{ ...pixelBorder(hexToRgb(Palette['gray-light'])!), boxShadow: `inset black 0px 0px 0px 4px, black 0px 0px 0px 4px` }}
@@ -41,6 +85,7 @@ function AppContent({ Component, loading, pageProps }: { loading: boolean } & Ap
 }
 
 export default function App(appProps: AppProps) {
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -62,7 +107,7 @@ export default function App(appProps: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <RecoilRoot>
-        <AppContent loading={loading} {...appProps} />
+        <AppContent loadingState={[loading, setLoading]} {...appProps} />
       </RecoilRoot>
     </QueryClientProvider>
   )
