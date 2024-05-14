@@ -1,11 +1,13 @@
 import { Roboto } from 'next/font/google';
 import styles from './googlebutton.module.css';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '@/utils/firebase';
 
 const roboto = Roboto({ subsets: ['latin'], weight: ['400', '500'] })
 
 export function GoogleLoginButton({ mode = 'login' }: { mode?: 'signin' | 'login' }) {
   return (
-    <button style={{ flexShrink: 0 }} className={styles['gsi-material-button']}>
+    <button onClick={() => signInWithPopup(auth, new GoogleAuthProvider())} style={{ flexShrink: 0 }} className={styles['gsi-material-button']}>
       <div className={styles['gsi-material-button-state']}></div>
       <div className="flex gap-3 items-center justify-center">
         <div className={styles['gsi-material-button-icon']}>

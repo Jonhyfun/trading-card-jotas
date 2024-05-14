@@ -27,7 +27,7 @@ function AppContent({ Component, loadingState, pageProps, ...otherAppProps }: { 
 
   const handleInitialSocket = useRecoilCallback(({ set, snapshot }) => async () => {
     setLoading(true)
-    if (!user) return
+    if (!user) return setLoading(false)
     console.log({ user })
     const token = await auth.currentUser!.getIdToken()
     const currentSocket = await snapshot.getPromise(websocketAtom)
