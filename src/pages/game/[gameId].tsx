@@ -1,4 +1,3 @@
-import { Card } from "@/components/Card";
 import { DeckCards, PlayerDeck } from "@/components/PlayerDeck";
 import { CardData, StackedCards } from "@/components/StackedCards";
 import { useGameSocket } from "@/hooks/useGameSocket";
@@ -8,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Loading } from "@/components/Loading";
 import { ProfileSquare } from "@/components/ProfileSquare";
 import { useCardModal } from "@/hooks/useCardModal";
+import { useDraggableSpawner } from "@/hooks/useDraggableSpawner";
 
 export default function Game() {
   const router = useRouter()
@@ -84,6 +84,8 @@ export default function Game() {
     }
   }, [leaveRoom, router.isReady, router.query.gameId])
 
+  const { draggableSpawner, spawnDraggable } = useDraggableSpawner()
+
   if (!hand) {
     return (
       <Layout>
@@ -94,6 +96,7 @@ export default function Game() {
 
   return (
     <Layout noPadding={gameData.gameState !== 'waitingForPlayers'}>
+      {draggableSpawner}
       {gameData.gameState === 'waitingForPlayers' ? (
         <div className="h-full w-full flex items-center justify-center">
           <div className="text-xs pb-10 sm:text-base">
@@ -147,6 +150,16 @@ export default function Game() {
               playerSrc="/indio80.png"
               deckState={[hand, setHand]}
               gameData={gameData}
+              onCardMouseDown={(cardRef) => {
+                const rect = cardRef.current.getBoundingClientRect()
+                cardRef.current.style.display = 'none'
+                cardRef.current.classList.remove('flex')
+
+                spawnDraggable(rect, () => {
+                  cardRef.current.style.display = ''
+                  cardRef.current.classList.add('flex')
+                })
+              }}
               onCardClick={(card) => {
                 openCardModal(card.cardKey, card.borderColor)
                 //setSelectedCard((current) => (current?.id === card.id ? undefined : card))
