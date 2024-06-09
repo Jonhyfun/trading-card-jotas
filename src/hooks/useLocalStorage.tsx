@@ -9,19 +9,19 @@ export const useLocalStorage = () => {
     if (deck.length !== 20) return
     window.localStorage.setItem('deck', JSON.stringify(deck))
     saveDeck(deck, withMessage)
-  },[saveDeck])
+  }, [saveDeck])
 
   const onLocalStorageChange = useCallback((e: StorageEvent) => {
-    if(e.newValue) {
+    if (e.newValue) {
       const deck = JSON.parse(e.newValue)
-      if(deck && deck.length && deck.length === 20) {
+      if (deck && deck.length && deck.length === 20) {
         setLocalDeck(deck)
       }
     }
     else {
       setLocalDeck(undefined)
     }
-  },[])
+  }, [])
 
   useEffect(() => {
     window.addEventListener("storage", onLocalStorageChange);
@@ -32,14 +32,14 @@ export const useLocalStorage = () => {
   }, [onLocalStorageChange]);
 
   useEffect(() => {
-    if(typeof window === 'undefined') return
+    if (typeof window === 'undefined') return
     const localDeckString = window.localStorage.getItem('deck')
-    if(localDeckString) {
+    if (localDeckString) {
       const parsedLocalDeck = JSON.parse(localDeckString)
       setLocalDeck(parsedLocalDeck)
       saveDeck(parsedLocalDeck)
-    } 
-  },[saveDeck])
+    }
+  }, [saveDeck])
 
   return { postLocalDeck, localDeck }
 }

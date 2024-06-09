@@ -1,4 +1,4 @@
-import { pixelBorder } from '@/utils/any'
+import { pixelBorder } from '@/utils'
 
 export function Loading({ text = 'Carregando' }: { text?: string }) {
   return (

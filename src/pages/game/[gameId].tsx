@@ -15,13 +15,13 @@ export default function Game() {
   const { joinRoom, lockStance, placeCard, leaveRoom, gameData } = useGameSocket();
 
   const [selectedCard, setSelectedCard] = useState<CardData>()
-  const [deck, setDeck] = useState<DeckCards | null>(null)
+  const [hand, setHand] = useState<DeckCards | null>(null)
 
   const [myCards, setMyCards] = useState<CardData[]>([])
   const [otherCards, setOtherCards] = useState<CardData[]>([])
 
-  const myStackRef = useRef<HTMLOListElement>(null)
-  const otherStackRef = useRef<HTMLOListElement>(null)
+  const myStackRef = useRef<HTMLDivElement>(null)
+  const otherStackRef = useRef<HTMLDivElement>(null)
 
   const handleCardPlacement = useCallback((card: CardData) => {
     lockStance()
@@ -30,20 +30,26 @@ export default function Game() {
   }, [lockStance, placeCard])
 
   useEffect(() => {
-    setDeck((gameData.hand ?? []).map(({ cardKey, id }) => ({ id, cardKey, borderColor: 'primary-light', src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png` })))
-  }, [gameData.hand])
+    setHand((gameData.me.hand ?? []).map(({ cardKey, id, ...rest }) => ({
+      id,
+      cardKey,
+      borderColor: 'primary-light',
+      src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`,
+      ...rest
+    })))
+  }, [gameData.me.hand])
 
   useEffect(() => {
-    setMyCards(gameData.myStack.map(({ cardKey, id }) => (
-      { id, cardKey, src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`, borderColor: 'primary-light' }
+    setMyCards(gameData.me.cardStack.map(({ cardKey, id, ...rest }) => (
+      { id, cardKey, src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`, borderColor: 'primary-light', ...rest }
     )))
-  }, [gameData.myStack])
+  }, [gameData.me.cardStack])
 
   useEffect(() => {
-    setOtherCards(gameData.otherStack.map(({ cardKey, id }) => (
-      { id, cardKey, src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`, borderColor: 'secondary-light' }
+    setOtherCards(gameData.otherPlayer.cardStack.map(({ cardKey, id, ...rest }) => (
+      { id, cardKey, src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`, borderColor: 'secondary-light', ...rest }
     )))
-  }, [gameData.otherStack])
+  }, [gameData.otherPlayer.cardStack])
 
   useEffect(() => {
     myStackRef.current?.scroll(myStackRef.current?.scrollWidth, 0);
@@ -54,7 +60,7 @@ export default function Game() {
   }, [otherCards])
 
   useEffect(() => {
-    setDeck((current) => {
+    setHand((current) => {
       if (!current) return current
       return current.map((card) => ({ ...card, borderColor: 'primary-light', selected: card.id === selectedCard?.id }))
     })
@@ -78,7 +84,7 @@ export default function Game() {
     }
   }, [leaveRoom, router.isReady, router.query.gameId])
 
-  if (!deck) {
+  if (!hand) {
     return (
       <Layout>
         <Loading />
@@ -87,7 +93,7 @@ export default function Game() {
   }
 
   return (
-    <Layout>
+    <Layout noPadding={gameData.gameState !== 'waitingForPlayers'}>
       {gameData.gameState === 'waitingForPlayers' ? (
         <div className="h-full w-full flex items-center justify-center">
           <div className="text-xs pb-10 sm:text-base">
@@ -96,53 +102,57 @@ export default function Game() {
         </div>
       ) : (
         <div className="h-full w-full flex flex-col">
-          <PlayerDeck playerSrc="/bowgor80.png" rival />
-          <div className={`w-full h-full flex justify-between flex-col gap-2 pt-6 ${selectedCard ? '' : 'pb-4'}`}>
-            <div className="flex gap-3 items-center">
-              <ProfileSquare borderColor={"secondary-light"} className="w-16 shrink-0 col-span-1" src={'/bowgor80.png'} />
+          <div className="px-2 pt-2">
+            <PlayerDeck playerSrc="/bowgor80.png" rival />
+          </div>
+          <div className={`w-full h-full flex flex-col gap-4 justify-around `}>
+            <div className="flex flex-col gap-3 items-center bg-gray-light pb-2 border-solid border-gray border-t-[1px] border-b-[1px]">
+              <div className="ml-auto flex gap-2 w-full items-center p-2">
+                <ProfileSquare borderColor={"secondary-light"} className="w-16 shrink-0 col-span-1" src={'/bowgor80.png'} />
+                <span className="w-28">({Number(gameData.otherPlayer.points).toFixed(2).replace('.', ',').replace(',00', '')})</span>
+              </div>
               <StackedCards
                 ref={otherStackRef}
+                sidePadding={"0.5rem"}
                 gameData={gameData}
                 cardState={[otherCards, setOtherCards]}
                 onCardClick={(card) => openCardModal(card.cardKey, card.borderColor)}
-                selectedCard={gameData.stance === 'attack' ? selectedCard : undefined}
+                selectedCard={gameData.me.stance === 'attack' ? selectedCard : undefined}
                 onCardPlacement={handleCardPlacement}
                 forStance="attack"
               />
-              <span className="ml-auto">({gameData.otherPoints.toString().replace('.', ',')})</span>
             </div>
-            <div className="flex gap-3 items-center">
-              <ProfileSquare borderColor={"primary-light"} className="w-16 shrink-0 col-span-1" src={'/indio80.png'} />
+            <div className="flex gap-3 flex-col items-center bg-gray-light pb-2 border-solid border-gray border-t-[1px] border-b-[1px]">
+              <div className="flex gap-2 w-full items-center p-2">
+                <ProfileSquare borderColor={"primary-light"} className="w-16 shrink-0 col-span-1" src={'/indio80.png'} />
+                <span className="w-28">({Number(gameData.me.points).toFixed(2).replace('.', ',').replace(',00', '')})</span>
+              </div>
               <StackedCards
                 ref={myStackRef}
+                sidePadding={"0.5rem"}
                 gameData={gameData}
                 cardState={[myCards, setMyCards]}
                 onCardClick={(card) => openCardModal(card.cardKey, card.borderColor)}
-                selectedCard={gameData.stance === 'defense' ? selectedCard : undefined}
+                selectedCard={gameData.me.stance === 'defense' ? selectedCard : undefined}
                 onCardPlacement={handleCardPlacement}
                 forStance="defense"
               />
-              <span className="ml-auto">({gameData.myPoints.toString().replace('.', ',')})</span>
             </div>
             {/**
            * //TODO setinha da alegria aqui se tiver uma carta selecionada (pro cara decidir a pilha) 
           **/}
           </div>
-          <div className="w-full flex items-start justify-end mb-2">
-            {selectedCard && (
-              <div onClick={() => openCardModal(selectedCard.cardKey, selectedCard.borderColor)} className="h-[4.875rem] md:h-[6.75rem] cursor-pointer">
-                <Card card={selectedCard} className="w-[2.356rem] h-[4.875rem] md:w-[3.625rem] md:h-[6.75rem]" />
-              </div>
-            )}
+          <div className="px-2 pb-2">
+            <PlayerDeck
+              playerSrc="/indio80.png"
+              deckState={[hand, setHand]}
+              gameData={gameData}
+              onCardClick={(card) => {
+                openCardModal(card.cardKey, card.borderColor)
+                //setSelectedCard((current) => (current?.id === card.id ? undefined : card))
+              }}
+            />
           </div>
-          <PlayerDeck
-            playerSrc="/indio80.png"
-            deckState={[deck, setDeck]} //TODO nao vai atualizar kkkkkk (melhor extrair o state, paciencia)
-            gameData={gameData}
-            onCardClick={(card) => {
-              setSelectedCard((current) => (current?.id === card.id ? undefined : card))
-            }}
-          />
         </div>
       )}
     </Layout>

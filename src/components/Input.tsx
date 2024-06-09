@@ -1,5 +1,5 @@
 import { Dispatch, InputHTMLAttributes, SetStateAction } from "react";
-import { pixelBorder } from '@/utils/any'
+import { pixelBorder } from '@/utils'
 
 export function Input({ className, state, ...inputProps }: { state?: [string, Dispatch<SetStateAction<string>>] } & InputHTMLAttributes<HTMLInputElement>) {
   return (

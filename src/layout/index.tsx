@@ -1,5 +1,5 @@
 import { Press_Start_2P } from "next/font/google";
-import { hexToRgb, pixelBorder, toggleCRT, Palette } from "@/utils/any";
+import { hexToRgb, pixelBorder, toggleCRT, Palette } from "@/utils";
 import { CSSProperties, PropsWithChildren, useMemo, useState } from "react";
 import { useModal } from "@/hooks/useModal";
 import { CheckeredPatternIcon } from "@/icons/CheckeredPatternIcon";
@@ -12,30 +12,30 @@ export const useCRT = () => { //TODO localstorage
     <div onClick={() => toggleCRT(setCrtActivated)} style={pixelBorder('black', 1)} className="fixed cursor-pointer w-12 h-12 right-3 bottom-2 bg-white rounded-[0.438rem] p-0.5">
       <div className="border-black border-2 w-full h-full flex items-center justify-center">
         {crtActivated ? (
-          <div className="w-5/6 h-5/6 bg-black"/>
-          ) : (
-            <CheckeredPatternIcon/>
-          )
+          <div className="w-5/6 h-5/6 bg-black" />
+        ) : (
+          <CheckeredPatternIcon />
+        )
         }
       </div>
     </div>
-  ),[crtActivated])
+  ), [crtActivated])
 }
 
-export function Layout({children, style} : PropsWithChildren<{style?: CSSProperties}>) {
+export function Layout({ children, style, noPadding }: PropsWithChildren<{ style?: CSSProperties, noPadding?: boolean }>) {
   const crtButton = useCRT()
-  const {Modal} = useModal()
+  const { Modal } = useModal()
 
   return (
     <main
-      className={`h-screen w-screen ${pixelFont.className} bg-bg-external flex items-center justify-center p-8`}
+      className={`h-screen w-screen ${pixelFont.className} bg-bg-external flex items-center justify-center ${noPadding ? '' : 'p-8'}`}
     >
       <div
         style={{
           ...pixelBorder('black', 1),
           boxShadow: '3px 3px 8px 2px #00000040'
         }}
-        className="w-full h-full md:max-w-[40rem] md:max-h-[40rem] max-h-[36rem] rounded-[0.625rem]"
+        className="w-full h-full md:max-w-[43rem] md:max-h-[43rem] max-h-[36rem] rounded-[0.625rem]"
       >
         <div className="bg-black w-full h-full">
           <div
@@ -50,8 +50,8 @@ export function Layout({children, style} : PropsWithChildren<{style?: CSSPropert
             >
               <div
                 className="w-full h-full border-2 border-primary-light bg-bg-internal"
-                >
-                <div style={style} className="w-full h-full border-2 border-black bg-bg-internal p-3">
+              >
+                <div style={style} className={`w-full h-full border-2 border-black bg-bg-internal ${noPadding ? '' : 'p-3'}`}>
                   {children}
                 </div>
               </div>

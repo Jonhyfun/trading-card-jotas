@@ -1,6 +1,6 @@
 import { GoogleLoginButton } from "@/components/GoogleButton"
 import { Input } from "@/components/Input"
-import { pixelBorder } from "@/utils/any";
+import { pixelBorder } from "@/utils";
 import { TripleBorder } from "@/components/TripleBorder"
 import { useAuth } from "@/hooks/useAuth";
 import { Layout } from "@/layout"

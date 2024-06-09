@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import { Palette } from "./src/utils/any";
+import { Palette } from "./src/utils";
 
 const config: Config = {
   important: true,

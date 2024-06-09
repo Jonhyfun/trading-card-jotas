@@ -2,7 +2,7 @@ import "@/styles/globals.css";
 import 'react-toastify/dist/ReactToastify.css';
 import type { AppProps } from "next/app";
 import { RecoilRoot, useRecoilCallback } from "recoil";
-import { Palette, hexToRgb, pixelBorder } from "@/utils/any";
+import { Palette, hexToRgb, pixelBorder } from "@/utils";
 import { ToastContainer } from 'react-toastify';
 import { Press_Start_2P } from "next/font/google";
 import { Dispatch, SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from "react";
@@ -25,26 +25,40 @@ function AppContent({ Component, loadingState, pageProps, ...otherAppProps }: { 
   const [error, setError] = useState(false)
   useCardsLoad();
 
+  const handleSocketOpen = useCallback(() => {
+    setLoading(false)
+  }, [setLoading])
+
+  const handleSocketClose = useCallback((newSocket: WebSocket, ev: CloseEvent) => {
+    if (ev.code != 3099) setError(true)
+  }, [])
+
+  const handleSocketError = useCallback(() => {
+    setError(true)
+  }, [])
+
   const handleInitialSocket = useRecoilCallback(({ set, snapshot }) => async () => {
-    setLoading(true)
-    if (!user) return setLoading(false)
-    console.log({ user })
+    if (!auth.currentUser) return
     const token = await auth.currentUser!.getIdToken()
     const currentSocket = await snapshot.getPromise(websocketAtom)
-    if (currentSocket) currentSocket.close();
+    if (currentSocket) currentSocket.close(3099);
 
+    const closeEventWrapper = (e: CloseEvent) => handleSocketClose(newSocket, e)
 
     const newSocket = new WebSocket(process.env.NEXT_PUBLIC_SOCKET_URL!, token)
-    newSocket.onopen = () => setLoading(false)
-    newSocket.onerror = () => setError(true)
-    newSocket.onclose = newSocket.onerror
+    newSocket.addEventListener('open', handleSocketOpen)
+    newSocket.addEventListener('error', handleSocketError)
+    newSocket.addEventListener('close', closeEventWrapper)
+    //TODO dispose? (esse é o app né então dispose é fechar o chrome)
 
     set(websocketAtom, newSocket)
-  }, [setLoading, user])
+  }, [handleSocketClose, handleSocketError, handleSocketOpen])
 
   useEffect(() => {
-    handleInitialSocket()
-  }, [handleInitialSocket])
+    if (user || user == null) {
+      handleInitialSocket()
+    }
+  }, [handleInitialSocket, user])
 
   useEffect(() => {
     if (error) {
@@ -87,7 +101,7 @@ function AppContent({ Component, loadingState, pageProps, ...otherAppProps }: { 
 export default function App(appProps: AppProps) {
 
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useLayoutEffect(() => {
     const handleStart = (url: string) => { if (url !== router.asPath) setLoading(true) };

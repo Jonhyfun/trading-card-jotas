@@ -1,11 +1,11 @@
 import Typewriter from 'react-ts-typewriter';
 import Link from 'next/link';
-import { pixelBorder } from "@/utils/any";
+import { pixelBorder } from "@/utils";
 import { TripleBorder } from "@/components/TripleBorder";
 import { Layout } from '@/layout';
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/router';
-import { makeId } from '@/utils/any';
+import { makeId } from '@/utils';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useAuth } from '@/hooks/useAuth';
 import { Input } from '@/components/Input';
@@ -93,7 +93,7 @@ export default function Home() {
   return (
     <Layout>
       {!user && <LoginPage />}
-      {!!user && <HomePage />}
+      {(user !== null && user !== undefined) && <HomePage />}
     </Layout>
   );
 }
