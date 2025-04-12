@@ -1,0 +1,11 @@
+{
+    "tailwindCSS.classAttributes": [
+      "class",
+      "className",
+      "cardContentClassNameOverwrite",
+      "ngClass"
+    ],
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+  }

@@ -1,0 +1,138 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.pnp.*
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+node_modules/
+jspm_packages/
+bower_components
+web_modules/
+
+# testing
+/coverage
+coverage
+.nyc_output
+*.lcov
+
+# next.js
+/.next/
+.next
+/out/
+out
+next-env.d.ts
+
+# production
+/build
+build/Release
+dist
+
+# misc
+.DS_Store
+*.pem
+*.tgz
+*.log
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# local env files
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# logs
+logs
+*.pid
+*.pid.lock
+*.seed
+pids
+
+# node diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# REPL history
+.node_repl_history
+
+# js coverage tools
+lib-cov
+
+# Grunt
+.grunt
+
+# node-waf
+.lock-wscript
+
+# eslint/stylelint cache
+.eslintcache
+.stylelintcache
+
+# Microbundle
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# REPL and vscode test
+.vscode-test
+
+# Parcel
+.cache
+.parcel-cache
+
+# Nuxt
+.nuxt
+
+# Gatsby
+.cache/
+
+# Vuepress
+.vuepress/dist
+.temp
+
+# Docusaurus
+.docusaurus
+
+# Serverless
+.serverless/
+
+# FuseBox
+.fusebox/
+
+# DynamoDB Local
+.dynamodb/
+
+# TernJS
+.tern-port
+
+# Service accounts or sensitive keys
+serviceAccountKey.json
+
+# Turbo Repo specific
+
+# Turbo cache folder (used by Turbo to store build cache for fast rebuilds)
+.turbo/
+.turbo/*
+
+# Turbo-generated output
+dist/
+
+# Optional: If you have specific cache directories for remote caching, exclude them as well
+# .turbo-cache/

@@ -1,0 +1,7 @@
+{
+  "extends": "next/core-web-vitals",
+  "plugins": ["eslint-plugin-next"],
+  "rules": {
+    "react/display-name": "off"
+  }
+}
