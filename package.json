@@ -2,9 +2,9 @@
   "name": "trading-card-jotas",
   "private": true,
   "workspaces": [
-    "trading-card-jotas-front",
-    "trading-card-jotas-server",
-    "trading-card-jotas-types"
+    "packages/trading-card-jotas-front",
+    "packages/trading-card-jotas-server",
+    "packages/trading-card-jotas-types"
   ],
   "scripts": {
     "build": "turbo run build",
