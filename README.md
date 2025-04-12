@@ -10,7 +10,7 @@ This repository is a monorepo powered by [Turborepo](https://turbo.build/repo). 
 
 ### Backend
 
-- **`trading-card-jotas-back`**: The backend API for managing game logic, user accounts, and data persistence built with Node.js and Express.
+- **`trading-card-jotas-back`**: The backend API/websockets for managing game logic, user accounts, and data persistence built with Node.js, Express and Prisma.
 
 ### Shared Types
 
