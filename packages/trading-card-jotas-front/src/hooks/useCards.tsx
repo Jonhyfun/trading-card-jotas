@@ -1,3 +1,5 @@
+"use client";
+
 import axios from "axios";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect } from "react";

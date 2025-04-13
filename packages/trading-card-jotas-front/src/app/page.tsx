@@ -146,7 +146,7 @@ export default function Home() {
   return (
     <Layout>
       {!user && <LoginPage />}
-      {!!user && <HomePage />}
+      {user && <HomePage />}
     </Layout>
   );
 }

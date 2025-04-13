@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-interface RouteFunction<
+export interface RouteFunction<
   Params extends Record<string, string> = {},
   ResBody = void
 > {

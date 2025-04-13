@@ -2,11 +2,7 @@ import * as routes from "./routes";
 import * as CardsObject from "./cards"; //TODO watch the folder to update in real time?
 import admin from "firebase-admin";
 import { InitializeExpress } from "./initializers/express";
-import {
-  ConnectedSocket,
-  InitializeWebSocket,
-  UserData,
-} from "./initializers/webSocket";
+import { InitializeWebSocket } from "./initializers/webSocket";
 import { Cards } from "./cards/types";
 import { isDev } from "./utils/meta";
 import { handlePointsSum } from "./game/points";
@@ -14,17 +10,8 @@ import { handleVisualEffects } from "./game/visual";
 import { onUserSetCard } from "./game";
 import { getMockConnectedUser } from "./utils/mock";
 import { deepCopy } from "./utils/object";
-
-type RoomType = { [key in string]: ConnectedSocket[] };
-let rooms: RoomType = {};
-
-export const deleteRoom = (room: string) => {
-  delete rooms[room];
-};
-export const setRooms = (setter: (current: RoomType) => RoomType) => {
-  rooms = setter(rooms);
-};
-export const getRooms = () => rooms;
+import { RouteFunction } from "./routes/types";
+import type { UserData } from "./states/room";
 
 const serviceAccount = require("../serviceAccountKey.json");
 
@@ -37,7 +24,15 @@ admin.initializeApp({
   const express = InitializeExpress();
   const websocket = InitializeWebSocket(express);
 
-  Object.values(routes).forEach((routeHandler) => {
+  Object.values(routes).forEach((_routeHandler) => {
+    const routeHandler = _routeHandler as RouteFunction;
+    if (!routeHandler.route) {
+      console.log();
+      return console.warn(
+        `\x1b[33m${routeHandler.name} has been skipped due to not having a route prop!\x1b[0m`
+      );
+    }
+
     routeHandler.route.params.forEach((param) => {
       (routeHandler as any).routeName = `${routeHandler.routeName}/:${
         param as string
@@ -63,7 +58,7 @@ admin.initializeApp({
   console.log();
   console.log("-----------------");
   console.log("\x1b[33m%s\x1b[0m", "Available Routes:");
-  express._router.stack.forEach((r) => {
+  express._router.stack.forEach((r: any) => {
     if (r.route && r.route.path) {
       console.log(
         "\x1b[32m%s\x1b[0m",

@@ -1,30 +1,38 @@
+"use client";
+
+import { setToken } from "@/_actions/cookie";
 import { auth } from "@/utils/firebase";
 import { User } from "firebase/auth";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { AppProps } from "next/app";
-import { useEffect } from "react";
+import { atomEffect } from "jotai-effect";
 
-const userAtom = atom<Pick<User, "email" | "uid"> | null>();
+export const userAtom = atom<Pick<User, "email" | "uid"> & { token: string }>();
 
-//? appProps é só pra obrigar esse hook a ser usado apenas no _app, mas até que dá pra fazer coisas bem legais com isso
-//? Também dava pra transformar isso num componente "provider" que dá throw se tentarem chamar o useAuth sem isso
-export const useAuthRegister = (appProps: AppProps) => {
-  const [user, setUser] = useAtom(userAtom);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      if (!authUser) return setUser(null as any);
-      setUser({
-        email: authUser.email,
-        uid: authUser.uid,
+const userAtomEffect = atomEffect((get, set) => {
+  console.log("user effect");
+  const unsubscribe = auth.onIdTokenChanged((user) => {
+    if (user) {
+      user.getIdToken().then((token) => {
+        setToken(token);
+        set(userAtom, {
+          email: user.email,
+          uid: user.uid,
+          token: token,
+        });
       });
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, [setUser]);
+      return;
+    }
+    setToken();
+    set(userAtom, undefined);
+  });
+  return () => {
+    console.log("user unmount");
+    unsubscribe();
+  };
+});
 
-  return user;
+export const useAuthRegister = () => {
+  useAtom(userAtomEffect);
 };
 
 export const useAuth = () => useAtomValue(userAtom);

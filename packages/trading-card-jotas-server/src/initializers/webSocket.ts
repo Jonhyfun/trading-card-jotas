@@ -1,4 +1,4 @@
-import * as Events from "../wsEvents";
+import * as Events from "@/wsEvents";
 import http from "http";
 import https from "https";
 import { readFileSync } from "fs";
@@ -6,32 +6,12 @@ import { WebSocketServer } from "ws";
 
 import type { Express } from "express";
 import type { WebSocket } from "ws";
-import { DeckCard } from "../cards/types";
+import { setSockets, type ConnectedSocket } from "@/states/socket";
 import { isDev } from "../utils/meta";
 import { getAuth } from "firebase-admin/auth";
 
-export interface UserData {
-  hand: DeckCard[];
-  ingameDeck: DeckCard[];
-  deck: DeckCard[];
-  points: (number | null)[];
-  cardStack: DeckCard[];
-  cardVisualEffects: ("overwritten" | "copied" | "ghost")[];
-  hiddenCards: DeckCard["id"][];
-  currentSetCard?: DeckCard;
-  globalEffects: ("invertedOdds" | "sendRepeatedTurn")[];
-  pendingEffects: (() => void)[];
-  room: string | null;
-  stance: "attack" | "defense";
-}
-
-export type ConnectedSocket = WebSocket &
-  UserData & {
-    uid: string;
-  };
-
 export function InitializeWebSocket(app: Express) {
-  const devMode = isDev()
+  const devMode = isDev();
   const server = (devMode ? http : https).createServer(
     {
       key: devMode ? undefined : readFileSync("privkey.pem"),
@@ -49,12 +29,15 @@ export function InitializeWebSocket(app: Express) {
       .verifyIdToken(ws.protocol)
       .then((decodedToken) => {
         ws.uid = decodedToken.uid;
+        setSockets((current) => ({ ...current, [ws.uid]: ws }));
+        console.log(`${ws.uid} connected!`);
+
         ws.on("message", (data) => {
           const [key, ...value] = data.toString().split("/");
-          const message = Events[key];
+          const message = Events[key as keyof typeof Events];
 
           if (message) {
-            message(ws, value);
+            message(ws, value as any);
           }
           //else if (data.toString() !== 'V1.2') {
           //  ws.send('mismatch');
