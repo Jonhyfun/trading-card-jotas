@@ -41,10 +41,20 @@ admin.initializeApp({
     } = routeHandler;
 
     express[method]<Request, Response>(`/${routeName}`, async (req, res) => {
-      const result = (await routeHandler(req, res)) as any;
-      if (!res.writableEnded) {
-        res.json(result);
+      let finished = false;
+
+      const closeResponse = () => {
+        finished = true;
+      };
+
+      const result = (await routeHandler(req, res, closeResponse)) as any;
+
+      if (!finished) {
+        if (!result) return res.status(200).end();
+        return res.json(result);
       }
+
+      return result;
     });
   });
 

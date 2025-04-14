@@ -17,16 +17,16 @@ export const getRoomsRoute = wrapRoute("rooms", (req, res) => {
 
 getRoomsRoute.route = { params: [], method: "get" };
 
-export const currentSocket = wrapRoute("currentSocket", (req, res) =>
-  withAuthorization(req, res, (user, socket) => res.send(socket.uid))
+export const currentSocket = wrapRoute("currentSocket", (req, res, close) =>
+  withAuthorization(req, res, close, (user, socket) => res.send(socket.uid))
 );
 
 currentSocket.route = { params: [], method: "get" };
 
 export const joinRoom = wrapRoute<Record<"room", string>>(
   "joinRoom",
-  (req, res) =>
-    withAuthorization(req, res, (user, socket) => {
+  (req, res, close) =>
+    withAuthorization(req, res, close, (user, socket) => {
       //TODO zod please lol
       const room = req.params.room;
 

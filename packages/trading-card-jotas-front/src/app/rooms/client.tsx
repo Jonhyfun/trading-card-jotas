@@ -3,7 +3,6 @@
 import { Loading } from "@/components/Loading";
 import { TripleBorder } from "@/components/TripleBorder";
 import { Layout } from "@/layout";
-import axios from "axios";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
@@ -16,9 +15,11 @@ export function RoomsClient({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      axios
-        .get(`${process.env.NEXT_PUBLIC_API_URL}/rooms`)
-        .then((response) => setRooms(response.data));
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms`)
+        .then((stream) => stream.json())
+        .then((response) => {
+          setRooms(response.data);
+        });
     }, 2000);
     return () => {
       clearInterval(interval);

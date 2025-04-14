@@ -1,3 +1,6 @@
+import "@/styles/globals.css";
+import "react-toastify/dist/ReactToastify.css";
+
 import { LayoutWrapper } from "./_components/LayoutWrapper";
 
 export default function RootLayout({

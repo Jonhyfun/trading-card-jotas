@@ -1,16 +1,14 @@
 "use client";
 
-import "@/styles/globals.css";
-import "react-toastify/dist/ReactToastify.css";
 import type { PropsWithChildren } from "react";
 import { Palette, hexToRgb, pixelBorder } from "@/utils";
 import { ToastContainer } from "react-toastify";
 import { Press_Start_2P } from "next/font/google";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCardsLoad } from "@/hooks/useCards";
 import { useAuthRegister } from "@/hooks/useAuth";
 import { useGameSocketRegister } from "@/hooks/useGameSocket";
-import { Provider, useAtom } from "jotai";
+import { Provider } from "jotai";
 
 const queryClient = new QueryClient();
 
@@ -25,12 +23,12 @@ function AppContent({ children }: PropsWithChildren<unknown>) {
     <>
       {children}
       <ToastContainer
-        bodyStyle={{ height: "4rem", margin: 0 }}
+        style={{ height: "4rem", margin: 0 }}
         toastStyle={{
           ...pixelBorder(hexToRgb(Palette["gray-light"])!),
           boxShadow: `inset black 0px 0px 0px 4px, black 0px 0px 0px 4px`,
         }}
-        bodyClassName="border-2 border-gray w-full p-0"
+        className="border-2 border-gray w-full p-0"
         toastClassName={`${pixelFont.className} rounded-none bg-bg-internal text-sm text-black p-0 border-solid border-2 border-white`}
         position="bottom-center"
         autoClose={3000}

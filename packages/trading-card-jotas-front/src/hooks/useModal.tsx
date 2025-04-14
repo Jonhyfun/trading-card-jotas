@@ -1,6 +1,6 @@
-import { TripleBorder, TripleBorderProps } from "@/components/TripleBorder";
 import { useMemo } from "react";
 import { atom, useAtom, useSetAtom } from "jotai";
+import { TripleBorder, TripleBorderProps } from "@/components/TripleBorder";
 
 const modalAtom = atom<{ open: boolean; modalContentProps: TripleBorderProps }>(
   {

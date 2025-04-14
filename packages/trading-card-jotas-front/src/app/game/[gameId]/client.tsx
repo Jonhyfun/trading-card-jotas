@@ -1,8 +1,9 @@
 "use client";
 
+import type { GameData, Player } from "trading-card-jotas-types";
 import { Card } from "@/components/Card";
-import { DeckCards, PlayerDeck } from "@/components/PlayerDeck";
-import { CardData, StackedCards } from "@/components/StackedCards";
+import { type DeckCards, PlayerDeck } from "@/components/PlayerDeck";
+import { type CardData, StackedCards } from "@/components/StackedCards";
 import { useGameSocket } from "@/hooks/useGameSocket";
 import { Layout } from "@/layout";
 import { useRouter } from "next/navigation";
@@ -17,7 +18,7 @@ export function Game({ gameId }: { gameId: string }) {
   // const { joinRoom, lockStance, placeCard, leaveRoom, gameData } =
   //   useGameSocket();
 
-  const gameData = {};
+  const gameData = {} as GameData & Player;
 
   const [selectedCard, setSelectedCard] = useState<CardData>();
   const [deck, setDeck] = useState<DeckCards | null>(null);
@@ -153,7 +154,7 @@ export function Game({ gameId }: { gameId: string }) {
                 forStance="attack"
               />
               <span className="ml-auto">
-                ({gameData.otherPoints.toString().replace(".", ",")})
+                ({gameData.points.toString().replace(".", ",")})
               </span>
             </div>
             <div className="flex gap-3 items-center">
@@ -176,7 +177,7 @@ export function Game({ gameId }: { gameId: string }) {
                 forStance="defense"
               />
               <span className="ml-auto">
-                ({gameData.myPoints.toString().replace(".", ",")})
+                ({gameData.points.toString().replace(".", ",")})
               </span>
             </div>
             {/**
@@ -187,12 +188,15 @@ export function Game({ gameId }: { gameId: string }) {
             {selectedCard && (
               <div
                 onClick={() =>
-                  openCardModal(selectedCard.cardKey, selectedCard.borderColor)
+                  openCardModal(
+                    selectedCard!.cardKey,
+                    selectedCard!.borderColor
+                  )
                 }
                 className="h-[4.875rem] md:h-[6.75rem] cursor-pointer"
               >
                 <Card
-                  card={selectedCard}
+                  card={selectedCard!}
                   className="w-[2.356rem] h-[4.875rem] md:w-[3.625rem] md:h-[6.75rem]"
                 />
               </div>

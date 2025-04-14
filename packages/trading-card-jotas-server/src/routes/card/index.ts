@@ -3,26 +3,26 @@ import * as cards from "@/cards";
 
 export const getCardImage = wrapRoute<{ cardName: string }>(
   "cardImage",
-  (req, res) => {
+  (req, res, close) => {
     const cardName = req.params.cardName.split(".")[0];
-    return res.sendFile(
-      `/${cardName}/${cardName}.png`,
-      { root: "src/cards" },
-      (err) => res.status(404).send(err)
+    res.sendFile(`/${cardName}/${cardName}.png`, { root: "src/cards" }, (err) =>
+      res.status(404).send(err)
     );
+    close();
   }
 );
 getCardImage.route = { params: ["cardName"], method: "get" };
 
 export const getVisualEffects = wrapRoute<{ effectName: string }>(
   "visualEffects",
-  (req, res) => {
+  (req, res, close) => {
     const effectName = req.params.effectName.split(".")[0];
-    return res.sendFile(
+    res.sendFile(
       `/${effectName}/${effectName}.png`,
       { root: "src/visualEffects" },
       (err) => res.status(404).send(err)
     );
+    close();
   }
 );
 
@@ -39,7 +39,7 @@ export const getCards = wrapRoute("cards", (req, res) => {
       };
     }
   );
-  return res.send(result);
+  return result;
 });
 
 getCards.route = { params: [], method: "get" };

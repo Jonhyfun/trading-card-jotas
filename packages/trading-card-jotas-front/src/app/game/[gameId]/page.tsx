@@ -2,11 +2,9 @@ import { cookies } from "next/headers";
 import { Game } from "./client";
 import { redirect } from "next/navigation";
 
-export default async function GamePage(
-  props: {
-    params: Promise<{ gameId: string }>;
-  }
-) {
+export default async function GamePage(props: {
+  params: Promise<{ gameId: string }>;
+}) {
   const params = await props.params;
   const cookieStore = await cookies();
 
@@ -26,5 +24,5 @@ export default async function GamePage(
     return <Game gameId={params.gameId} />;
   }
 
-  return redirect("/");
+  redirect("/");
 }
