@@ -1,6 +1,8 @@
+"use client";
+
 import { GoogleLoginButton } from "@/components/GoogleButton";
 import { Input } from "@/components/Input";
-import { pixelBorder } from "@/utils/any";
+import { pixelBorder } from "@/utils";
 import { TripleBorder } from "@/components/TripleBorder";
 import { useAuth } from "@/hooks/useAuth";
 import { Layout } from "@/layout";
@@ -9,16 +11,18 @@ import { errorToast } from "@/utils/toast";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loading } from "@/components/Loading";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const user = useAuth();
+  const [loadingForm, setLoadingForm] = useState(false);
+
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   const handleSignIn = useCallback(() => {
-    setLoading(true);
+    setLoadingForm(true);
     createUserWithEmailAndPassword(auth, email, password)
       .then((response) => {
         //console.log(response)
@@ -35,14 +39,20 @@ export default function SignInPage() {
         errorToast("Erro desconhecido, tente novamente mais tarde!");
       })
       .finally(() => {
-        setLoading(false);
+        setLoadingForm(false);
       });
   }, [email, password]);
 
-  //? So é possível por que no app, nem renderiza nada se o user for undefined (então é sempre user, null ou tela de loading)
   useEffect(() => {
     if (user) router.replace("/");
   }, [router, user]);
+
+  if (loading || user)
+    return (
+      <Layout>
+        <Loading />
+      </Layout>
+    );
 
   return (
     <Layout>
@@ -75,7 +85,7 @@ export default function SignInPage() {
 
             <div className="flex flex-col gap-4 items-center justify-endtext-center w-full">
               <button
-                disabled={loading}
+                disabled={loadingForm}
                 onClick={handleSignIn}
                 style={{
                   ...pixelBorder("black"),

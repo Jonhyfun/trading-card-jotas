@@ -1,24 +1,28 @@
-import { DeckCard } from "../cards/types"
-import { ConnectedSocket, UserData } from "../initializers/webSocket"
+import type { ConnectedSocket, UserData } from "@/states/socket";
+import { DeckCard } from "../cards/types";
 
-export const initialUserData = {
-  stance: 'attack',
-  operation: '',
+export const initialUserData: UserData = {
+  stance: "attack",
   points: [],
   cardVisualEffects: [],
   pendingEffects: [],
   globalEffects: [],
   hand: [],
   hiddenCards: [],
-  cardStack: []
-}
+  cardStack: [],
+  room: null,
+  deck: [],
+  ingameDeck: [],
+};
 
-export const getMockConnectedUser = (room: string, ip: string, deck: DeckCard[]): UserData & Pick<ConnectedSocket, 'ip' | 'send'> => ({
+export const getMockConnectedUser = (
+  room: string,
+  deck: DeckCard[]
+): UserData & Pick<ConnectedSocket, "send"> => ({
   ...initialUserData,
   ingameDeck: deck,
-  stance: 'attack',
+  stance: "attack",
   room,
-  ip,
   deck,
-  send: () => { }
-})
+  send: () => {},
+});

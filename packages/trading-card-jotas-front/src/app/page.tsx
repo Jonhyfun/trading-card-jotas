@@ -1,13 +1,12 @@
 "use client";
 
-import Typewriter from "react-ts-typewriter";
 import Link from "next/link";
-import { pixelBorder } from "@/utils/any";
+import { Palette, pixelBorder } from "@/utils";
 import { TripleBorder } from "@/components/TripleBorder";
 import { Layout } from "@/layout";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { makeId } from "@/utils/any";
+import { makeId } from "@/utils";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/Input";
@@ -15,6 +14,8 @@ import { GoogleLoginButton } from "@/components/GoogleButton";
 import { auth } from "@/utils/firebase";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { errorToast } from "@/utils/toast";
+import { Loading } from "@/components/Loading";
+import { useTypewriter } from "@/hooks/useTypewriter";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -98,6 +99,7 @@ function LoginPage() {
 function HomePage() {
   const router = useRouter();
   const { localDeck } = useLocalStorage();
+  const title = useTypewriter("Stackquation", 100);
 
   const createGame = useCallback(() => {
     const game = makeId(5);
@@ -106,7 +108,18 @@ function HomePage() {
 
   return (
     <div className="pt-8 grid grid-rows-3 w-full h-full">
-      <Typewriter cursor={false} text="Trading Card Game do Jotas em breve!" />
+      <div className="text-4xl text-white w-full flex justify-center my-auto pb-20">
+        <TripleBorder className="w-fit">
+          <span
+            style={{
+              textShadow: `rgb(0 0 0) -3px 3px 0px`,
+            }}
+            className="bg-gray block p-2.5"
+          >
+            {title}
+          </span>
+        </TripleBorder>
+      </div>
       <TripleBorder className="row-span-2" borderColor="gray-light">
         <div className="w-full h-full md:p-5 md:pt-7 p-3 pt-5 flex flex-col gap-6 md:text-base text-xs">
           <Link href="/rooms" className="group cursor-pointer">
@@ -141,12 +154,18 @@ function HomePage() {
 }
 
 export default function Home() {
-  const user = useAuth();
+  const { user, loading } = useAuth();
 
   return (
     <Layout>
-      {!user && <LoginPage />}
-      {user && <HomePage />}
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          {!user && <LoginPage />}
+          {user && <HomePage />}
+        </>
+      )}
     </Layout>
   );
 }

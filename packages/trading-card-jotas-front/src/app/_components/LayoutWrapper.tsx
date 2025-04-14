@@ -3,7 +3,7 @@
 import "@/styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import type { PropsWithChildren } from "react";
-import { Palette, hexToRgb, pixelBorder } from "@/utils/any";
+import { Palette, hexToRgb, pixelBorder } from "@/utils";
 import { ToastContainer } from "react-toastify";
 import { Press_Start_2P } from "next/font/google";
 import { QueryClient, QueryClientProvider } from "react-query";

@@ -2,13 +2,17 @@ import { cookies } from "next/headers";
 import { Game } from "./client";
 import { redirect } from "next/navigation";
 
-export default async function GamePage() {
+export default async function GamePage({
+  params,
+}: {
+  params: { gameId: string };
+}) {
   const cookieStore = await cookies();
 
-  if (!cookieStore.get("token")) return redirect("/");
+  if (!cookieStore.get("token") || !params.gameId) return redirect("/");
 
-  const tokenResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/currentSocket`,
+  const joinRoomResponse = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/joinRoom/${params.gameId}`,
     {
       headers: new Headers({
         Authorization: "Bearer " + cookieStore.get("token")?.value,
@@ -16,8 +20,10 @@ export default async function GamePage() {
     }
   );
 
-  const token = await tokenResponse.text();
-  return <>{token}</>;
+  const response = await joinRoomResponse.json();
+  if (response && response.success) {
+    return <Game gameId={params.gameId} />;
+  }
 
-  return <Game />;
+  return redirect("/");
 }

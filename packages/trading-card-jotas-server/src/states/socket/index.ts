@@ -20,7 +20,7 @@ export type ConnectedSocket = WebSocket &
     uid: string;
   };
 
-type SocketsType = { [key in string]: ConnectedSocket };
+type SocketsType = Record<string, ConnectedSocket>;
 let sockets: SocketsType = {};
 
 export const deleteSocket = (room: string) => {

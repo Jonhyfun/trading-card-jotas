@@ -9,7 +9,7 @@ export const websocketAtom = atom<WebSocket>();
 
 const websocketAtomEffect = withAtomEffect(userAtom, (get, set) => {
   console.log("socket effect");
-  const user = get(userAtom);
+  const { user } = get(userAtom);
   if (!user) return;
 
   let newSocket: WebSocket;

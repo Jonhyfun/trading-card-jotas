@@ -1,7 +1,7 @@
 "use client";
 
 import { Press_Start_2P } from "next/font/google";
-import { hexToRgb, pixelBorder, toggleCRT, Palette } from "@/utils/any";
+import { hexToRgb, pixelBorder, toggleCRT, Palette } from "@/utils";
 import { CSSProperties, PropsWithChildren, useMemo, useState } from "react";
 import { useModal } from "@/hooks/useModal";
 import { CheckeredPatternIcon } from "@/icons/CheckeredPatternIcon";

@@ -7,7 +7,7 @@ export interface RouteFunction<
   (req: Request<Params>, res: Response): ResBody;
   readonly routeName: string;
   route: {
-    params: (keyof Params)[];
+    params: keyof Params extends never ? [] : [keyof Params];
     method: "get" | "post";
   };
 }

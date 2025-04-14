@@ -1,6 +1,6 @@
 import type { ConnectedSocket } from "../socket";
 
-type RoomType = { [key in string]: ConnectedSocket[] };
+type RoomType = Record<string, ConnectedSocket[]>;
 let rooms: RoomType = {};
 
 export const deleteRoom = (room: string) => {

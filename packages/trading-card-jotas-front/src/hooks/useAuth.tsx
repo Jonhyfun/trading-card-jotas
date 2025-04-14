@@ -6,27 +6,31 @@ import { User } from "firebase/auth";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { atomEffect } from "jotai-effect";
 
-export const userAtom = atom<Pick<User, "email" | "uid"> & { token: string }>();
+export const userAtom = atom<{
+  user?: Pick<User, "email" | "uid"> & { token: string };
+  loading: boolean;
+}>({ loading: true });
 
 const userAtomEffect = atomEffect((get, set) => {
-  console.log("user effect");
   const unsubscribe = auth.onIdTokenChanged((user) => {
     if (user) {
       user.getIdToken().then((token) => {
         setToken(token);
         set(userAtom, {
-          email: user.email,
-          uid: user.uid,
-          token: token,
+          user: {
+            email: user.email,
+            uid: user.uid,
+            token: token,
+          },
+          loading: false,
         });
       });
       return;
     }
-    setToken();
-    set(userAtom, undefined);
+    setToken(undefined);
+    set(userAtom, { user: undefined, loading: false });
   });
   return () => {
-    console.log("user unmount");
     unsubscribe();
   };
 });

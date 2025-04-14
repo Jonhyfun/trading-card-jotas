@@ -11,11 +11,13 @@ import { Loading } from "@/components/Loading";
 import { ProfileSquare } from "@/components/ProfileSquare";
 import { useCardModal } from "@/hooks/useCardModal";
 
-export function Game() {
+export function Game({ gameId }: { gameId: string }) {
   const router = useRouter();
   const { openCardModal } = useCardModal();
-  const { joinRoom, lockStance, placeCard, leaveRoom, gameData } =
-    useGameSocket();
+  // const { joinRoom, lockStance, placeCard, leaveRoom, gameData } =
+  //   useGameSocket();
+
+  const gameData = {};
 
   const [selectedCard, setSelectedCard] = useState<CardData>();
   const [deck, setDeck] = useState<DeckCards | null>(null);
@@ -28,45 +30,47 @@ export function Game() {
 
   const handleCardPlacement = useCallback(
     (card: CardData) => {
-      lockStance();
-      placeCard(card.id);
+      //lockStance();
+      //placeCard(card.id);
       setSelectedCard(undefined);
     },
-    [lockStance, placeCard]
+    [
+      /*lockStance, placeCard*/
+    ]
   );
 
-  useEffect(() => {
-    setDeck(
-      (gameData.hand ?? []).map(({ cardKey, id }) => ({
-        id,
-        cardKey,
-        borderColor: "primary-light",
-        src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`,
-      }))
-    );
-  }, [gameData.hand]);
+  // useEffect(() => {
+  //   setDeck(
+  //     (gameData.hand ?? []).map(({ cardKey, id }) => ({
+  //       id,
+  //       cardKey,
+  //       borderColor: "primary-light",
+  //       src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`,
+  //     }))
+  //   );
+  // }, [gameData.hand]);
 
-  useEffect(() => {
-    setMyCards(
-      gameData.myStack.map(({ cardKey, id }) => ({
-        id,
-        cardKey,
-        src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`,
-        borderColor: "primary-light",
-      }))
-    );
-  }, [gameData.myStack]);
+  // useEffect(() => {
+  //   setMyCards(
+  //     gameData.myStack.map(({ cardKey, id }) => ({
+  //       id,
+  //       cardKey,
+  //       src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`,
+  //       borderColor: "primary-light",
+  //     }))
+  //   );
+  // }, [gameData.myStack]);
 
-  useEffect(() => {
-    setOtherCards(
-      gameData.otherStack.map(({ cardKey, id }) => ({
-        id,
-        cardKey,
-        src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`,
-        borderColor: "secondary-light",
-      }))
-    );
-  }, [gameData.otherStack]);
+  // useEffect(() => {
+  //   setOtherCards(
+  //     gameData.otherStack.map(({ cardKey, id }) => ({
+  //       id,
+  //       cardKey,
+  //       src: `${process.env.NEXT_PUBLIC_API_URL}/cardImage/${cardKey}.png`,
+  //       borderColor: "secondary-light",
+  //     }))
+  //   );
+  // }, [gameData.otherStack]);
 
   useEffect(() => {
     myStackRef.current?.scroll(myStackRef.current?.scrollWidth, 0);
@@ -87,35 +91,35 @@ export function Game() {
     });
   }, [selectedCard]);
 
-  useEffect(() => {
-    const deck = JSON.parse(window.localStorage.getItem("deck") ?? "[]");
-    if (deck.length !== 20) {
-      router.push("/");
-    }
-    if (router.isReady && router.query.gameId) {
-      joinRoom(JSON.stringify({ room: router.query.gameId.toString(), deck }));
-    }
-  }, [joinRoom, router]);
+  // useEffect(() => {
+  //   const deck = JSON.parse(window.localStorage.getItem("deck") ?? "[]");
+  //   if (deck.length !== 20) {
+  //     router.push("/");
+  //   }
+  //   if (router.isReady && router.query.gameId) {
+  //     joinRoom(JSON.stringify({ room: router.query.gameId.toString(), deck }));
+  //   }
+  // }, [joinRoom, router]);
 
-  useEffect(() => {
-    return () => {
-      if (router.isReady) {
-        leaveRoom(router.query.gameId!.toString());
-      }
-    };
-  }, [leaveRoom, router.isReady, router.query.gameId]);
+  // useEffect(() => {
+  //   return () => {
+  //     if (router.isReady) {
+  //       leaveRoom(router.query.gameId!.toString());
+  //     }
+  //   };
+  // }, [leaveRoom, router.isReady, router.query.gameId]);
 
-  if (!deck) {
-    return (
-      <Layout>
-        <Loading />
-      </Layout>
-    );
-  }
+  // if (!deck) {
+  //   return (
+  //     <Layout>
+  //       <Loading />
+  //     </Layout>
+  //   );
+  // }
 
   return (
     <Layout>
-      {gameData.gameState === "waitingForPlayers" ? (
+      {true /*|| gameData.gameState === "waitingForPlayers"*/ ? (
         <div className="h-full w-full flex items-center justify-center">
           <div className="text-xs pb-10 sm:text-base">
             <Loading text="Aguardando jogadores" />
