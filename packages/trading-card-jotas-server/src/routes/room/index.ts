@@ -1,4 +1,4 @@
-import type { UserData } from "@/states/socket";
+import type { UserData } from "trading-card-jotas-types/cards/types";
 import { initialUserData as shallowInitialUserData } from "@/utils/mock";
 import { deepCopy } from "@/utils/object";
 import { wrapRoute } from "../types";
@@ -6,13 +6,15 @@ import { getRooms, setRooms } from "@/states/room";
 import { withAuthorization } from "../middlewares";
 import { removeUserFromRoom } from "@/utils/game/room";
 
-export const getRoomsRoute = wrapRoute("rooms", (req, res) => {
-  return res.send(
+export const getRoomsRoute = wrapRoute("rooms", (req, res, close) => {
+  console.log(getRooms());
+  res.send(
     Object.entries(getRooms()).map(([key, players]) => ({
       room: key,
       playerCount: players.length,
     }))
   );
+  close();
 });
 
 getRoomsRoute.route = { params: [], method: "get" };
@@ -34,7 +36,7 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
       initialUserData.room = room;
 
       Object.entries(initialUserData).forEach(([key, value]) => {
-        socket[key as keyof UserData] = value;
+        socket[key as keyof UserData] = value as any;
       });
 
       socket.room = room;
@@ -69,6 +71,7 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
 
           onUserJoinRoom();
 
+          console.log("forced A");
           return {
             ...current,
             [room]: [...current[room], socket],
@@ -78,12 +81,14 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
         if (!socket.deck || socket.deck.length !== 20) {
           socket.send("error/Deck inválido!");
           socket.send("redirect/-");
+          console.log("forced B");
           return current;
         }
 
         if (current[room]?.length === 2) {
           socket.send("error/Sala cheia!");
           socket.send("redirect/rooms");
+          console.log("forced C");
           return current;
         }
 
@@ -93,6 +98,7 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
 
           current[room][0].send("setGameState/running");
           socket.send("setGameState/running");
+          console.log("forced D");
           return {
             ...current,
             [room]: [current[room][0], socket],

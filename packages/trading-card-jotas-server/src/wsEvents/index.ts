@@ -1,5 +1,8 @@
 import type { ConnectedSocket } from "@/states/socket";
-import type { Cards, DeckCard } from "../cards/types";
+import type {
+  Cards,
+  DeckCard,
+} from "../../../trading-card-jotas-types/cards/types";
 import { onUserSetCard } from "../game";
 import { makeId, shuffle } from "../utils/random";
 

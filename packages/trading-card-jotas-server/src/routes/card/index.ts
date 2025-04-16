@@ -1,5 +1,5 @@
+import * as cards from "trading-card-jotas-types/cards";
 import { wrapRoute } from "../types";
-import * as cards from "@/cards";
 
 export const getCardImage = wrapRoute<{ cardName: string }>(
   "cardImage",
@@ -18,7 +18,7 @@ export const getVisualEffects = wrapRoute<{ effectName: string }>(
   (req, res, close) => {
     const effectName = req.params.effectName.split(".")[0];
     res.sendFile(
-      `/${effectName}/${effectName}.png`,
+      `/${effectName}/${effectName}.png`, //todo types needs to build the images? lol
       { root: "src/visualEffects" },
       (err) => res.status(404).send(err)
     );

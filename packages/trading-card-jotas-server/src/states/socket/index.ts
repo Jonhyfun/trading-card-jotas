@@ -1,19 +1,4 @@
-import { DeckCard } from "@/cards/types";
-
-export interface UserData {
-  hand: DeckCard[];
-  ingameDeck: DeckCard[];
-  deck: DeckCard[];
-  points: (number | null)[];
-  cardStack: DeckCard[];
-  cardVisualEffects: ("overwritten" | "copied" | "ghost")[];
-  hiddenCards: DeckCard["id"][];
-  currentSetCard?: DeckCard;
-  globalEffects: ("invertedOdds" | "sendRepeatedTurn")[];
-  pendingEffects: (() => void)[];
-  room: string | null;
-  stance: "attack" | "defense";
-}
+import type { UserData } from "trading-card-jotas-types/cards/types";
 
 export type ConnectedSocket = WebSocket &
   UserData & {

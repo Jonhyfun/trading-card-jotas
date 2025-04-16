@@ -5,7 +5,7 @@ export const useLocalStorage = () => {
   //const { saveDeck } = useGameSocket()
   const [localDeck, setLocalDeck] = useState<string[]>();
 
-  const postLocalDeck = useCallback((deck: string[], withMessage = false) => {
+  const commitLocalDeck = useCallback((deck: string[], withMessage = false) => {
     if (deck.length !== 20) return;
     window.localStorage.setItem("deck", JSON.stringify(deck));
     //saveDeck(deck, withMessage)
@@ -40,5 +40,5 @@ export const useLocalStorage = () => {
     }
   }, []);
 
-  return { postLocalDeck, localDeck };
+  return { commitLocalDeck, localDeck };
 };

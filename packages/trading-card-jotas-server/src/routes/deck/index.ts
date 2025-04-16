@@ -1,29 +1,24 @@
-import { PrismaQuery } from "@/providers/prisma";
 import { wrapRoute } from "../types";
-import { Cards } from "@/cards/types";
+import { withAuthorization } from "../middlewares";
+import { makeId } from "@/utils/random";
+import { Cards } from "trading-card-jotas-types/cards/types";
 
-export const postSetDeck = wrapRoute("setDeck", async (req, res) => {
-  const cards = req.body.cards as Cards[];
-  const uid = ""; // TODO: get the uid
-
-  await PrismaQuery(async (prisma) => {
-    const deck = await prisma.deck.create({
-      data: {
-        userFirebaseId: uid,
-        cards: {
-          createMany: {
-            data: [
-              {
-                id: "carta-mucho-loka", // TODO: update card ID
-              },
-            ],
-          },
-        },
-      },
-    });
+export const postSetDeck = wrapRoute("setDeck", async (req, res, close) => {
+  withAuthorization(req, res, close, (user, socket) => {
+    const selectedCards = req.body as Cards[];
+    if (!socket.hand || socket.hand?.length === 0) {
+      if (selectedCards && selectedCards.length) {
+        socket.deck = [];
+        selectedCards.forEach((cardKey, i) => {
+          socket.deck.push({ cardKey, id: `${i}-${makeId(8)}` });
+        });
+        console.log(`${socket.uid} salvou o deck`);
+        return { success: true }; //TODO não ta retornando isso aqui
+      }
+    }
+    res.status(400).json({ error: "Invalid socket connection" });
+    close();
   });
-
-  return res.send("OK");
 });
 
 postSetDeck.route = { params: [], method: "post" };

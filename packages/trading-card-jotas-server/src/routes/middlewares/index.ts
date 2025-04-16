@@ -39,7 +39,6 @@ export function withAuthorization<T>(
         close();
         return undefined as unknown as Promise<T>;
       }
-
       return callback(user, socket);
     });
 }

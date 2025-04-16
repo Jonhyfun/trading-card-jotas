@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as routes from "./routes";
-import * as CardsObject from "./cards"; //TODO watch the folder to update in real time?
+import * as CardsObject from "../../trading-card-jotas-types/cards"; //TODO watch the folder to update in real time?
 import admin from "firebase-admin";
 import { InitializeExpress } from "./initializers/express";
 import { InitializeWebSocket } from "./initializers/webSocket";

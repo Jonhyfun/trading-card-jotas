@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import type { Cards } from "trading-card-jotas-types/cards/types";
 import { Card } from "@/components/Card";
 import { Layout } from "@/layout";
 import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { LightColors, TripleBorder } from "@/components/TripleBorder";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { errorToast } from "@/utils/toast";
-import { BackendCard, useCards } from "@/hooks/useCards";
+import { type BackendCard, useCards } from "@/hooks/useCards";
 import { useCardModal } from "@/hooks/useCardModal";
+import { useGameAPI } from "@/hooks/useGameAPI";
+import { useAuth } from "@/hooks/useAuth";
 
 const addModes = {
   add: "Adicionar",
@@ -24,14 +27,16 @@ const addModesColors: { [key in keyof typeof addModes]: LightColors } = {
 
 export function DeckClient({ cards }: { cards: BackendCard[] }) {
   //TODO shared types
+  const { user } = useAuth();
+  const { saveDeck } = useGameAPI();
   const { openCardModal } = useCardModal();
-  const { postLocalDeck, localDeck } = useLocalStorage();
+  const { commitLocalDeck, localDeck } = useLocalStorage();
   const [addMode, setAddMode] = useState<(keyof typeof addModes)[]>([
     "add",
     "info",
     "remove",
   ]);
-  const [deck, setDeck] = useState<string[]>([]);
+  const [deck, setDeck] = useState<Cards[]>([]);
 
   const toggleAddMode = useCallback(() => {
     setAddMode((current) => {
@@ -50,7 +55,7 @@ export function DeckClient({ cards }: { cards: BackendCard[] }) {
             current.filter((_cardKey) => _cardKey === cardKey).length === limit
           )
             return current;
-          return [...current, cardKey];
+          return [...current, cardKey as Cards];
         });
       } else {
         setDeck((current) => {
@@ -60,7 +65,7 @@ export function DeckClient({ cards }: { cards: BackendCard[] }) {
           if (amount <= 0) return current;
           const result = current.filter((_cardKey) => _cardKey !== cardKey);
           for (let i = 0; i < amount - 1; i++) {
-            result.push(cardKey);
+            result.push(cardKey as Cards);
           }
           return result;
         });
@@ -95,12 +100,14 @@ export function DeckClient({ cards }: { cards: BackendCard[] }) {
 
   const postDeck = useCallback(() => {
     if (deck.length !== 20) return errorToast("Selecione 20 cartas!");
-    postLocalDeck(deck, true);
-  }, [deck, postLocalDeck]);
+    saveDeck(deck, user!.token).then(() => {
+      commitLocalDeck(deck, true);
+    });
+  }, [deck, commitLocalDeck]);
 
   useEffect(() => {
     if (localDeck && localDeck.length === 20) {
-      setDeck(localDeck);
+      setDeck(localDeck as Cards[]);
     }
   }, [localDeck]);
 
