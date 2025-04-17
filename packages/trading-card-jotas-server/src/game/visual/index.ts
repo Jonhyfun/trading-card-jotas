@@ -1,7 +1,7 @@
-import { CardData } from "../../../../trading-card-jotas-types/cards/types";
-import { UserData } from "../../initializers/webSocket";
+import type { CardData } from "trading-card-jotas-types/cards/types";
+import { Player } from "@/models/player";
 
-export const handleVisualEffects = (user: UserData, stack: CardData[]) => {
+export const handleVisualEffects = (player: Player, stack: CardData[]) => {
   stack.forEach((deckCard, i) => {
     if (deckCard.operation && deckCard.operation !== ".") {
       const previousCard = stack[i - 1];
@@ -12,7 +12,7 @@ export const handleVisualEffects = (user: UserData, stack: CardData[]) => {
         !previousCard ||
         (previousCard && previousCard.operation === ".")
       ) {
-        user.cardVisualEffects[i] = "overwritten";
+        player.cardVisualEffects[i] = "overwritten";
       }
     }
   });

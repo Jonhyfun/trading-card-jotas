@@ -1,13 +1,11 @@
-import type { UserData } from "trading-card-jotas-types/cards/types";
-import { initialUserData as shallowInitialUserData } from "@/utils/mock";
-import { deepCopy } from "@/utils/object";
 import { wrapRoute } from "../types";
 import { getRooms, setRooms } from "@/states/room";
 import { withAuthorization } from "../middlewares";
 import { removeUserFromRoom } from "@/utils/game/room";
+import { validDeck } from "../../utils/game/deck/validations";
+import { RoomPlayer } from "@/states/socket";
 
 export const getRoomsRoute = wrapRoute("rooms", (req, res, close) => {
-  console.log(getRooms());
   res.send(
     Object.entries(getRooms()).map(([key, players]) => ({
       room: key,
@@ -31,13 +29,7 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
     withAuthorization(req, res, close, (user, socket) => {
       //TODO zod please lol
       const room = req.params.room;
-
-      const initialUserData = deepCopy(shallowInitialUserData);
-      initialUserData.room = room;
-
-      Object.entries(initialUserData).forEach(([key, value]) => {
-        socket[key as keyof UserData] = value as any;
-      });
+      console.log(req.cookies);
 
       socket.room = room;
 
@@ -45,7 +37,7 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
         socket.onclose = () => {
           removeUserFromRoom(socket, room);
         };
-        socket.send(`setStance/${socket.stance}`);
+        socket.send(`setStance/${socket.player.stance}`);
         socket.send("joinedRoom");
       };
 
@@ -63,9 +55,9 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
             1
           )[0];
 
-          Object.keys(initialUserData).forEach((key) => {
-            socket[key as keyof UserData] = removedUser[
-              key as keyof UserData
+          Object.keys(removedUser).forEach((key) => {
+            socket[key as keyof RoomPlayer] = removedUser[
+              key as keyof RoomPlayer
             ] as never;
           });
 
@@ -78,7 +70,7 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
           };
         }
 
-        if (!socket.deck || socket.deck.length !== 20) {
+        if (!validDeck(socket.player.deck.map(({ cardKey }) => cardKey))) {
           socket.send("error/Deck inválido!");
           socket.send("redirect/-");
           console.log("forced B");
@@ -94,7 +86,9 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
 
         if (current[room]?.[0]) {
           onUserJoinRoom();
-          console.log(`${socket.uid} entrou em ${room} como ${socket.stance}`);
+          console.log(
+            `${socket.uid} entrou em ${room} como ${socket.player.stance}`
+          );
 
           current[room][0].send("setGameState/running");
           socket.send("setGameState/running");
@@ -107,7 +101,9 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
 
         onUserJoinRoom();
 
-        console.log(`${socket.uid} entrou em ${room} como ${socket.stance}`);
+        console.log(
+          `${socket.uid} entrou em ${room} como ${socket.player.stance}`
+        );
 
         return { ...current, [room]: [socket] };
       });

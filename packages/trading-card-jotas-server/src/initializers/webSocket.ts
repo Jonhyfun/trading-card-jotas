@@ -9,6 +9,7 @@ import type { WebSocket } from "ws";
 import { setSockets, type ConnectedSocket } from "@/states/socket";
 import { isDev } from "../utils/meta";
 import { getAuth } from "firebase-admin/auth";
+import { Player } from "@/models/player";
 
 export function InitializeWebSocket(app: Express) {
   const devMode = isDev();
@@ -29,6 +30,8 @@ export function InitializeWebSocket(app: Express) {
       .verifyIdToken(ws.protocol)
       .then((decodedToken) => {
         ws.uid = decodedToken.uid;
+        ws.player = new Player(ws);
+
         setSockets((current) => ({ ...current, [ws.uid]: ws }));
         console.log(`${ws.uid} connected!`);
 

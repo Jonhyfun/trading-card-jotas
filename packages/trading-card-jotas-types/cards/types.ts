@@ -7,19 +7,15 @@ export interface DeckCard {
   id: string;
 }
 
-export interface UserData {
+export type Stance = "attack" | "defense";
+
+export interface PlayerData {
+  uid: string;
   hand: DeckCard[];
-  ingameDeck: DeckCard[];
   deck: DeckCard[];
-  points: (number | null)[];
-  cardStack: DeckCard[];
-  cardVisualEffects: ("overwritten" | "copied" | "ghost")[];
-  hiddenCards: DeckCard["id"][];
-  currentSetCard?: DeckCard;
-  globalEffects: ("invertedOdds" | "sendRepeatedTurn")[];
-  pendingEffects: (() => void)[];
-  room: string | null;
-  stance: "attack" | "defense";
+  points: number[];
+  stack: DeckCard[];
+  stance: Stance;
 }
 
 export interface CardData {
@@ -31,5 +27,5 @@ export interface CardData {
   priority?: 1 | 2;
   limit: 1 | 2 | 3;
   modifyPreviousCard?: (card: CardData) => CardData;
-  effect: (cardOwner: UserData, otherPlayer: UserData) => void;
+  effect: (cardOwner: PlayerData, otherPlayer: PlayerData) => void;
 }

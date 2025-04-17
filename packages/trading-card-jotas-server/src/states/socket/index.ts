@@ -1,9 +1,12 @@
-import type { UserData } from "trading-card-jotas-types/cards/types";
+import type { Player } from "@/models/player";
 
-export type ConnectedSocket = WebSocket &
-  UserData & {
-    uid: string;
-  };
+export interface RoomPlayer {
+  uid: string;
+  player: Player;
+  room: string;
+}
+
+export type ConnectedSocket = WebSocket & RoomPlayer;
 
 type SocketsType = Record<string, ConnectedSocket>;
 let sockets: SocketsType = {};
