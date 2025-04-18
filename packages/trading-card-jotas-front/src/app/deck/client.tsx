@@ -7,11 +7,12 @@ import { Layout } from "@/layout";
 import { MouseEvent, useCallback, useEffect, useState } from "react";
 import { LightColors, TripleBorder } from "@/components/TripleBorder";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { errorToast } from "@/utils/toast";
+import { errorToast, successToast } from "@/utils/toast";
 import { type BackendCard, useCards } from "@/hooks/useCards";
 import { useCardModal } from "@/hooks/useCardModal";
 import { useGameAPI } from "@/hooks/useGameAPI";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "react-toastify";
 
 const addModes = {
   add: "Adicionar",
@@ -100,10 +101,14 @@ export function DeckClient({ cards }: { cards: BackendCard[] }) {
 
   const postDeck = useCallback(() => {
     if (deck.length !== 20) return errorToast("Selecione 20 cartas!");
-    saveDeck(deck, user!.token).then(() => {
-      commitLocalDeck(deck, true);
-    });
-  }, [deck, commitLocalDeck]);
+    void saveDeck(deck, user!.token)
+      .then((response) => {
+        if (response.success) {
+          successToast(response.success);
+        }
+      })
+      .catch(() => errorToast("Deck inválido!"));
+  }, [deck, saveDeck, user]);
 
   useEffect(() => {
     if (localDeck && localDeck.length === 20) {

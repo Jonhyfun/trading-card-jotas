@@ -1,13 +1,12 @@
-import { UserData } from "../../../trading-card-jotas-server/src/initializers/webSocket";
-import { CardData } from "../types";
+import type { CardType, PlayerType } from "../types";
 
-const cardData: CardData = {
+const Card: CardType = {
   label: "-",
   value: null,
   limit: 2,
-  effect: (castingPlayer: UserData, otherPlayer: UserData) => {
-    castingPlayer.globalEffects.push("invertedOdds");
+  effect: (castingPlayer: PlayerType) => {
+    //TODO castingPlayer.effects.push("invertedOdds");
   },
 };
 
-export default cardData;
+export default Card;

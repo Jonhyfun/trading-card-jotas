@@ -1,19 +1,18 @@
 import * as CardsObject from "..";
-import { UserData } from "../../../trading-card-jotas-server/src/initializers/webSocket";
-import { CardData } from "../types";
+import type { CardType, PlayerType } from "../types";
 
-const cardData: CardData = {
+const Card: CardType = {
   label: "^",
   ghost: true,
   value: null,
   limit: 1,
   desc: "Mova a carta anterior para trás.",
-  effect: (cardOwner: UserData, otherPlayer: UserData) => {
-    if (cardOwner.cardStack.length === 1) return;
+  effect: (cardOwner: PlayerType) => {
+    if (cardOwner.stack.cards.length === 1) return;
 
     let lastNonGhostIndex = -1;
-    for (let i = cardOwner.cardStack.length - 1; i >= 0; i--) {
-      if (!CardsObject[cardOwner.cardStack[i].cardKey].default.ghost) {
+    for (let i = cardOwner.stack.cards.length - 1; i >= 0; i--) {
+      if (!CardsObject[cardOwner.stack.cards[i].cardKey].default.ghost) {
         lastNonGhostIndex = i;
         break;
       }
@@ -21,10 +20,10 @@ const cardData: CardData = {
 
     if (lastNonGhostIndex === -1) return;
 
-    const movedCard = cardOwner.cardStack.splice(lastNonGhostIndex, 1)[0];
+    const movedCard = cardOwner.stack.cards.splice(lastNonGhostIndex, 1)[0];
     const newIndex = lastNonGhostIndex - 1;
-    cardOwner.cardStack.splice(newIndex, 0, movedCard);
+    cardOwner.stack.cards.splice(newIndex, 0, movedCard);
   },
 };
 
-export default cardData;
+export default Card;

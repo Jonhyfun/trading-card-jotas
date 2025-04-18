@@ -7,18 +7,25 @@ export interface DeckCard {
   id: string;
 }
 
+export type VisualEffects = "overwritten" | "copied" | "ghost";
+export type PlayerEffects = "keepStance";
 export type Stance = "attack" | "defense";
 
-export interface PlayerData {
+export interface StackType {
+  cards: DeckCard[];
+  visualEffects: Record<string, VisualEffects>;
+}
+
+export interface PlayerType {
   uid: string;
   hand: DeckCard[];
   deck: DeckCard[];
-  points: number[];
-  stack: DeckCard[];
+  effects: PlayerEffects[];
+  stack: StackType;
   stance: Stance;
 }
 
-export interface CardData {
+export interface CardType {
   label: string;
   value: number | null;
   ghost?: boolean;
@@ -26,6 +33,11 @@ export interface CardData {
   desc?: string;
   priority?: 1 | 2;
   limit: 1 | 2 | 3;
-  modifyPreviousCard?: (card: CardData) => CardData;
-  effect: (cardOwner: PlayerData, otherPlayer: PlayerData) => void;
+  modifyPreviousCard?: (card: CardType) => CardType;
+  effect: (cardOwner: PlayerType, otherPlayer: PlayerType) => void;
 }
+
+export type PlayerSyncData = Pick<PlayerType, "hand" | "effects" | "stance"> & {
+  stack: DeckCard[];
+  points: string;
+};

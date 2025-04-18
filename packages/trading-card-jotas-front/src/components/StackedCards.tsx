@@ -17,7 +17,7 @@ import type { GameData } from "trading-card-jotas-types";
 
 //todo Matematica Man
 
-export type CardData = {
+export type CardType = {
   cardKey: string;
   src: string;
   id: string;
@@ -25,11 +25,11 @@ export type CardData = {
 };
 
 type StackedCardsProps = {
-  cardState: [CardData[], Dispatch<SetStateAction<CardData[]>>];
+  cardState: [CardType[], Dispatch<SetStateAction<CardType[]>>];
   forStance?: "attack" | "defense";
-  selectedCard?: CardData;
-  onCardPlacement?: (card: CardData) => void;
-  onCardClick?: (card: CardData) => void;
+  selectedCard?: CardType;
+  onCardPlacement?: (card: CardType) => void;
+  onCardClick?: (card: CardType) => void;
   gameData: GameData;
 };
 
@@ -48,7 +48,7 @@ export const StackedCards = forwardRef(
     const { cards: cardsData } = useCards();
     const [cards, setCards] = cardState;
     const [hoveredCardId, setHoveredCardId] = useState<
-      CardData["id"] | undefined
+      CardType["id"] | undefined
     >();
 
     //const visualEffects = useMemo(

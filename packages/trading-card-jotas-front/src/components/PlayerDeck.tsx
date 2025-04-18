@@ -1,12 +1,12 @@
 import type { GameData } from "trading-card-jotas-types";
 import { Dispatch, SetStateAction, useState } from "react";
 import { ProfileSquare } from "./ProfileSquare";
-import { CardData } from "./StackedCards";
+import { CardType } from "./StackedCards";
 import { TripleBorder } from "./TripleBorder";
 import { Card } from "./Card";
 import Link from "next/link";
 
-export type DeckCards = (CardData & {
+export type DeckCards = (CardType & {
   selected?: boolean;
 })[];
 
@@ -15,7 +15,7 @@ type PlayerDeckProps = {
   gameData?: GameData;
   deckState?: [DeckCards | null, Dispatch<SetStateAction<DeckCards | null>>];
   rival?: boolean;
-  onCardClick?: (card: CardData) => void;
+  onCardClick?: (card: CardType) => void;
 };
 
 export function PlayerDeck({
@@ -57,13 +57,13 @@ export function PlayerDeck({
                       borderColor: "secondary-light",
                       id: i.toString(),
                       src: "",
-                    } as DeckCards[number])
+                    }) as DeckCards[number]
                 )
-              : deck ?? []
+              : (deck ?? [])
             ).map((card) => (
               <div
                 key={`${card.id}-inventory`}
-                onClick={() => onCardClick(card as CardData)}
+                onClick={() => onCardClick(card as CardType)}
                 className={`${
                   card.selected ? "md:-translate-y-3 -translate-y-1" : ""
                 } md:px-1 py-1 px-0 h-full flex items-center cursor-pointer md:hover:-translate-y-3 hover:-translate-y-1`}
@@ -71,7 +71,7 @@ export function PlayerDeck({
                 <div className="min-w-12 w-12 h-[4.25rem] block">
                   <Card
                     className="text-xs"
-                    card={card as CardData}
+                    card={card as CardType}
                     facingDown={rival}
                   />
                 </div>

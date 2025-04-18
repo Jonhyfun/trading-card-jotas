@@ -1,18 +1,17 @@
 import * as cards from "trading-card-jotas-types/cards";
+import type {
+  DeckCard,
+  PlayerSyncData,
+} from "trading-card-jotas-types/cards/types";
 import type { ConnectedSocket } from "@/states/socket";
-import type { DeckCard } from "trading-card-jotas-types/cards/types";
-import { deleteRoom, getRooms } from "@/states/room";
+import { deleteRoom } from "@/states/room";
 import { Player } from "./player";
-import { handlePointsSum } from "@/game/points";
-import { handleVisualEffects } from "@/game/visual";
 
-export class Game<Players extends Record<ConnectedSocket["uid"], Player>> {
-  players: Players;
+type Players = Record<ConnectedSocket["uid"], Player>;
+
+export class Game {
+  players: Players = {};
   currentSetCards!: Record<keyof Players, DeckCard | undefined>;
-
-  constructor(_players: Players) {
-    this.players = _players;
-  }
 
   #getStancedPlayers() {
     let attackingPlayer!: Player;
@@ -32,11 +31,9 @@ export class Game<Players extends Record<ConnectedSocket["uid"], Player>> {
   #triggerVictory() {
     const { attackingPlayer, defendingPlayer } = this.#getStancedPlayers();
     const attackWins =
-      (attackingPlayer.points.slice(-1)?.[0] ?? 0) >
-      (defendingPlayer.points.slice(-1)?.[0] ?? 0);
+      attackingPlayer.getPoints() > defendingPlayer.getPoints();
     const defenseWins =
-      (defendingPlayer.points.slice(-1)?.[0] ?? 0) >
-      (attackingPlayer.points.slice(-1)?.[0] ?? 0);
+      defendingPlayer.getPoints() > attackingPlayer.getPoints();
 
     attackingPlayer.socket.send(
       `${attackWins ? "endWining" : "endLosing"}/${
@@ -52,24 +49,45 @@ export class Game<Players extends Record<ConnectedSocket["uid"], Player>> {
     deleteRoom(attackingPlayer.socket.room);
   }
 
+  #getStacks(playerId: keyof Players) {
+    const player = this.players[playerId];
+    const otherId = (Object.keys(this.players) as (keyof Players)[]).find(
+      (id) => id !== playerId
+    );
+
+    if (!otherId) throw new Error("There must be 2 non-spectator players!");
+
+    const otherPlayer = this.players[otherId];
+
+    const ownerStack =
+      player.stance === "attack" ? otherPlayer.stack.cards : player.stack.cards;
+
+    const otherStack =
+      player.stance === "defense"
+        ? otherPlayer.stack.cards
+        : player.stack.cards;
+
+    return { ownerStack, otherStack };
+  }
+
   #revealCards() {
     const { attackingPlayer, defendingPlayer } = this.#getStancedPlayers();
 
-    const firstPendingEffect = attackingPlayer.pendingEffects.shift(); //TODO some sort of effects engine
-    if (firstPendingEffect) firstPendingEffect();
+    // const firstPendingEffect = attackingPlayer.pendingEffects.shift(); //TODO some sort of effects engine
+    // if (firstPendingEffect) firstPendingEffect();
 
-    const secondPendingEffect = defendingPlayer.pendingEffects.shift();
-    if (secondPendingEffect) secondPendingEffect();
+    // const secondPendingEffect = defendingPlayer.pendingEffects.shift();
+    // if (secondPendingEffect) secondPendingEffect();
 
     const logicalCards = [
       {
-        id: attackingPlayer.stack.slice(-1)[0].id,
-        card: cards[attackingPlayer.stack.slice(-1)[0].cardKey].default,
+        id: attackingPlayer.stack.cards.slice(-1)[0].id,
+        card: cards[attackingPlayer.stack.cards.slice(-1)[0].cardKey].default,
         owner: attackingPlayer,
       },
       {
-        id: defendingPlayer.stack.slice(-1)[0].id,
-        card: cards[defendingPlayer.stack.slice(-1)[0].cardKey].default,
+        id: defendingPlayer.stack.cards.slice(-1)[0].id,
+        card: cards[defendingPlayer.stack.cards.slice(-1)[0].cardKey].default,
         owner: defendingPlayer,
       },
     ];
@@ -86,36 +104,25 @@ export class Game<Players extends Record<ConnectedSocket["uid"], Player>> {
 
     //? Se depois do primeiro efeito o dono das cartas trocou, troca a ordem dos argumentos do efeito pra refletir isso (RIP POO)
     if (
-      firstCardOwner.stack.slice(-1)[0].id === secondCardId ||
-      secondCardOwner.stack.slice(-1)[0].id === firstCardId
+      firstCardOwner.stack.cards.slice(-1)[0].id === secondCardId ||
+      secondCardOwner.stack.cards.slice(-1)[0].id === firstCardId
     )
       secondCard.effect(firstCardOwner, secondCardOwner);
     else secondCard.effect(secondCardOwner, firstCardOwner);
 
-    const attackingPlayerStack = attackingPlayer.stack.map(
-      ({ cardKey }) => cards[cardKey].default
-    );
-    const defendingPlayerStack = defendingPlayer.stack.map(
-      ({ cardKey }) => cards[cardKey].default
-    );
+    attackingPlayer.calculatePoints();
+    defendingPlayer.calculatePoints();
 
-    attackingPlayer.points.push(
-      handlePointsSum(attackingPlayer, attackingPlayerStack)
-    );
-    defendingPlayer.points.push(
-      handlePointsSum(defendingPlayer, defendingPlayerStack)
-    );
-
-    const currentAttackingGlobal = attackingPlayer.globalEffects.shift();
-    const currentDefendingGlobal = defendingPlayer.globalEffects.shift();
+    const currentAttackerEffect = attackingPlayer.effects.shift();
+    const currentDefenderEffect = defendingPlayer.effects.shift();
 
     [attackingPlayer, defendingPlayer].forEach((player) => {
       const nextCard = player.deck.splice(0, 1)?.[0];
 
       if (
         !(
-          currentAttackingGlobal === "sendRepeatedTurn" ||
-          currentDefendingGlobal === "sendRepeatedTurn"
+          currentAttackerEffect === "keepStance" ||
+          currentDefenderEffect === "keepStance"
         )
       ) {
         player.stance = player.stance === "attack" ? "defense" : "attack";
@@ -125,48 +132,50 @@ export class Game<Players extends Record<ConnectedSocket["uid"], Player>> {
         player.hand.push(nextCard);
       }
 
-      player.socket.send(`setStance/${player.stance}`);
-      player.socket.send(`loadHand/${JSON.stringify(player.hand)}`);
-      player.socket.send(`loadMyStack/${JSON.stringify(player.stack)}`); //TODO juntar todos esses 6 sends?
-      player.socket.send(
-        `loadMyPoints/${player.points.slice(-1)[0].toFixed(2)}`
-      );
+      // player.socket.send(`setStance/${player.stance}`);
+      // player.socket.send(`loadHand/${JSON.stringify(player.hand)}`);
+      // player.socket.send(`loadMyStack/${JSON.stringify(player.stack.cards)}`); //TODO juntar todos esses 6 sends?
+      // player.socket.send(
+      //   `loadMyPoints/${player.points.slice(-1)[0].toFixed(2)}`
+      // );
     });
 
-    handleVisualEffects(attackingPlayer, attackingPlayerStack); //TODO where will visualEffects be? maybe another class altogether
-    handleVisualEffects(defendingPlayer, defendingPlayerStack);
+    attackingPlayer.stack.handleVisualEffects();
+    defendingPlayer.stack.handleVisualEffects();
 
-    attackingPlayer.socket.send(
-      `loadOtherStack/${JSON.stringify(defendingPlayer.stack)}`
-    ); //TODO dry?
-    defendingPlayer.socket.send(
-      `loadOtherStack/${JSON.stringify(attackingPlayer.stack)}`
-    );
+    // attackingPlayer.socket.send(
+    //   `loadOtherStack/${JSON.stringify(defendingPlayer.stack.cards)}`
+    // ); //TODO dry?
+    // defendingPlayer.socket.send(
+    //   `loadOtherStack/${JSON.stringify(attackingPlayer.stack.cards)}`
+    // );
 
-    attackingPlayer.socket.send(
-      `loadVisualEffects/${JSON.stringify(attackingPlayer.cardVisualEffects)}`
-    );
-    defendingPlayer.socket.send(
-      `loadVisualEffects/${JSON.stringify(defendingPlayer.cardVisualEffects)}`
-    );
+    // attackingPlayer.socket.send(
+    //   `loadVisualEffects/${JSON.stringify(attackingPlayer.cardVisualEffects)}`
+    // );
+    // defendingPlayer.socket.send(
+    //   `loadVisualEffects/${JSON.stringify(defendingPlayer.cardVisualEffects)}`
+    // );
 
-    attackingPlayer.socket.send(
-      `loadOtherVisualEffects/${JSON.stringify(
-        defendingPlayer.cardVisualEffects
-      )}`
-    );
-    defendingPlayer.socket.send(
-      `loadOtherVisualEffects/${JSON.stringify(
-        attackingPlayer.cardVisualEffects
-      )}`
-    );
+    // attackingPlayer.socket.send(
+    //   `loadOtherVisualEffects/${JSON.stringify(
+    //     defendingPlayer.cardVisualEffects
+    //   )}`
+    // );
+    // defendingPlayer.socket.send(
+    //   `loadOtherVisualEffects/${JSON.stringify(
+    //     attackingPlayer.cardVisualEffects
+    //   )}`
+    // );
 
-    attackingPlayer.socket.send(
-      `loadOtherPoints/${(defendingPlayer.points.slice(-1)[0] ?? 0).toFixed(2)}`
-    );
-    defendingPlayer.socket.send(
-      `loadOtherPoints/${(attackingPlayer.points.slice(-1)[0] ?? 0).toFixed(2)}`
-    );
+    // attackingPlayer.socket.send(
+    //   `loadOtherPoints/${(defendingPlayer.points.slice(-1)[0] ?? 0).toFixed(2)}`
+    // );
+    // defendingPlayer.socket.send(
+    //   `loadOtherPoints/${(attackingPlayer.points.slice(-1)[0] ?? 0).toFixed(2)}`
+    // );
+
+    this.syncData();
 
     if (
       attackingPlayer.hand.length === 0 ||
@@ -176,50 +185,43 @@ export class Game<Players extends Record<ConnectedSocket["uid"], Player>> {
     }
   }
 
-  #getStacks(playerId: keyof Players) {
-    const player = this.players[playerId];
-    const otherId = (Object.keys(this.players) as (keyof Players)[]).find(
-      (id) => id !== playerId
-    );
+  onCardPlaced(ownerId: keyof Game["players"]) {
+    const roomPlayers = Object.values(this.players);
+    const otherPlayer = roomPlayers.find(({ uid }) => uid !== ownerId);
 
-    if (!otherId) throw new Error("There must be 2 non-spectator players!");
+    if (!otherPlayer) {
+      this.currentSetCards[ownerId] = undefined;
+      return roomPlayers[0].socket.send("error/Sala vazia!");
+    }
 
-    const otherPlayer = this.players[otherId];
+    if (roomPlayers.every((player) => this.currentSetCards[player.uid])) {
+      const { ownerStack, otherStack } = this.#getStacks(ownerId);
 
-    const focusedStack =
-      player.stance === "attack" ? otherPlayer.stack : player.stack;
+      ownerStack.push(
+        this.currentSetCards[ownerId as keyof Players] as DeckCard
+      );
+      otherStack.push(
+        this.currentSetCards[otherPlayer.uid as keyof Players] as DeckCard
+      );
 
-    const otherStack =
-      player.stance === "defense" ? otherPlayer.stack : player.stack;
+      this.currentSetCards[ownerId as keyof Players] = undefined;
+      this.currentSetCards[otherPlayer.uid as keyof Players] = undefined;
 
-    return { focusedStack, otherStack };
+      return this.#revealCards();
+    }
   }
 
-  placeCard(playerId: keyof Players, card: DeckCard) {
-    const player = this.players[playerId];
-    if (!this.currentSetCards[playerId]) {
-      this.currentSetCards[playerId] = card;
-
-      const roomPlayers = getRooms()[player.socket.room];
-      const otherPlayer = roomPlayers.find(({ uid }) => uid !== player.uid);
-
-      if (!otherPlayer) return player.socket.send("error/Sala vazia!");
-
-      if (roomPlayers.every((player) => this.currentSetCards[player.uid])) {
-        const { focusedStack, otherStack } = this.#getStacks(playerId);
-
-        focusedStack.push(
-          this.currentSetCards[player.uid as keyof Players] as DeckCard
-        );
-        otherStack.push(
-          this.currentSetCards[otherPlayer.uid as keyof Players] as DeckCard
-        );
-
-        this.currentSetCards[player.uid as keyof Players] = undefined;
-        this.currentSetCards[otherPlayer.uid as keyof Players] = undefined;
-
-        return this.#revealCards();
-      }
-    }
+  syncData() {
+    Object.values(this.players).forEach((player) => {
+      player.socket.send(
+        `syncData/${JSON.stringify({
+          points: player.getPoints().toString(),
+          hand: player.hand,
+          stack: player.stack.cards,
+          stance: player.stance,
+          effects: player.effects,
+        } as PlayerSyncData)}`
+      );
+    });
   }
 }

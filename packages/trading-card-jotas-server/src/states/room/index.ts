@@ -1,6 +1,6 @@
-import type { Player } from "@/models/player";
+import type { Room } from "@/models/room";
 
-type RoomType = Record<string, Player[]>;
+type RoomType = Record<string, Room>;
 let rooms: RoomType = {};
 
 export const deleteRoom = (room: string) => {
@@ -10,3 +10,4 @@ export const setRooms = (setter: (current: RoomType) => RoomType) => {
   rooms = setter(rooms);
 };
 export const getRooms = () => rooms;
+export const getRoom = (roomId: keyof typeof rooms) => rooms[roomId];

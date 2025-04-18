@@ -1,26 +1,27 @@
 import * as CardsObject from "..";
-import { UserData } from "../../../trading-card-jotas-server/src/initializers/webSocket";
-import { CardData } from "../types";
+import type { CardType, PlayerType } from "../types";
 
-const cardData: CardData = {
+const Card: CardType = {
   label: "*",
   value: null,
   limit: 2,
   desc: "Essa carta se transforma na carta anterior.",
-  effect: (cardOwner: UserData, otherPlayer: UserData) => {
-    if (cardOwner.cardStack.length <= 1) return;
+  effect: (cardOwner: PlayerType, otherPlayer: PlayerType) => {
+    if (cardOwner.stack.cards.length <= 1) return;
 
-    cardOwner.cardStack.splice(-1);
-    cardOwner.cardStack.push(cardOwner.cardStack.slice(-1)[0]);
+    cardOwner.stack.cards.splice(-1);
+    cardOwner.stack.cards.push(cardOwner.stack.cards.slice(-1)[0]);
 
-    cardOwner.cardVisualEffects[cardOwner.cardStack.length - 1] = "copied";
+    cardOwner.stack.visualEffects[
+      cardOwner.stack.cards[cardOwner.stack.cards.length - 1].id
+    ] = "copied";
 
     const copiedCard =
-      CardsObject[cardOwner.cardStack.slice(-1)[0].cardKey].default;
-    if (copiedCard.label !== cardData.label) {
+      CardsObject[cardOwner.stack.cards.slice(-1)[0].cardKey].default;
+    if (copiedCard.label !== Card.label) {
       copiedCard.effect(cardOwner, otherPlayer);
     }
   },
 };
 
-export default cardData;
+export default Card;

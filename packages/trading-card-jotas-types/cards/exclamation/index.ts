@@ -1,25 +1,24 @@
-import { UserData } from "../../../trading-card-jotas-server/src/initializers/webSocket";
-import { CardData } from "../types";
+import type { CardType, PlayerType } from "../types";
 
-const cardData: CardData = {
+const Card: CardType = {
   label: "!",
   value: null,
   limit: 2,
   operation: ".",
   desc: "Troca essa carta com a carta jogada na outra pilha.",
   priority: 2,
-  effect: (cardOwner: UserData, otherPlayer: UserData) => {
-    const lastCastingPlayerCard = cardOwner.cardStack.splice(-1, 1);
-    const lastOtherPlayerCard = otherPlayer.cardStack.splice(-1, 1);
+  effect: (cardOwner: PlayerType, otherPlayer: PlayerType) => {
+    const lastCastingPlayerCard = cardOwner.stack.cards.splice(-1, 1);
+    const lastOtherPlayerCard = otherPlayer.stack.cards.splice(-1, 1);
 
     if (
       lastCastingPlayerCard.length === 1 &&
       lastOtherPlayerCard.length === 1
     ) {
-      cardOwner.cardStack.push(lastOtherPlayerCard[0]);
-      otherPlayer.cardStack.push(lastCastingPlayerCard[0]);
+      cardOwner.stack.cards.push(lastOtherPlayerCard[0]);
+      otherPlayer.stack.cards.push(lastCastingPlayerCard[0]);
     }
   },
 };
 
-export default cardData;
+export default Card;

@@ -1,9 +1,10 @@
 import type { Cards } from "trading-card-jotas-types/cards/types";
+import { DECK_SIZE } from "trading-card-jotas-types/consts";
 import * as cards from "trading-card-jotas-types/cards";
 
 export function validDeck(deck?: Cards[]) {
   //TODO return reason?
-  if (!deck || deck.length !== 20) return false;
+  if (!deck || deck.length !== DECK_SIZE) return false;
 
   const uniqueCards = [...new Set(deck)];
 

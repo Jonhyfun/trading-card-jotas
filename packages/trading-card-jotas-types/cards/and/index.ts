@@ -1,17 +1,16 @@
-import { UserData } from "../../../trading-card-jotas-server/src/initializers/webSocket";
-import { CardData } from "../types";
+import type { CardType, PlayerType } from "../types";
 
-const cardData: CardData = {
+const Card: CardType = {
   label: "&",
   value: 2,
   limit: 2,
   operation: ".",
   desc: "Essa carta anda duas casas para trás.",
-  effect: (pileOwner: UserData, otherPlayer: UserData) => {
-    const cards = pileOwner.cardStack.splice(-3);
+  effect: (pileOwner: PlayerType) => {
+    const cards = pileOwner.stack.cards.splice(-3);
     const and = cards.splice(-1);
-    pileOwner.cardStack.push(...[...and, ...cards]);
+    pileOwner.stack.cards.push(...[...and, ...cards]);
   },
 };
 
-export default cardData;
+export default Card;

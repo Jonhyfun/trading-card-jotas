@@ -1,24 +1,48 @@
+import type { Cards } from "trading-card-jotas-types/cards/types";
+import * as cards from "trading-card-jotas-types/cards";
+import prisma from "@/providers/prisma";
+import { DECK_SIZE } from "trading-card-jotas-types/consts";
 import { wrapRoute } from "../types";
 import { withAuthorization } from "../middlewares";
-import { makeId } from "@/utils/random";
-import { Cards } from "trading-card-jotas-types/cards/types";
 
-export const postSetDeck = wrapRoute("setDeck", async (req, res, close) => {
-  withAuthorization(req, res, close, (user, socket) => {
-    const selectedCards = req.body as Cards[];
-    if (!socket.hand || socket.hand?.length === 0) {
-      if (selectedCards && selectedCards.length) {
-        socket.deck = [];
-        selectedCards.forEach((cardKey, i) => {
-          socket.deck.push({ cardKey, id: `${i}-${makeId(8)}` });
-        });
-        console.log(`${socket.uid} salvou o deck`);
-        return { success: true }; //TODO não ta retornando isso aqui
+export const saveDeck = wrapRoute("saveDeck", (req, res, close) =>
+  withAuthorization(req, res, close, async (user, socket) => {
+    const deck = req.body as Cards[];
+
+    if (!deck || deck.length !== DECK_SIZE) {
+      res.status(400).send({ error: "Invalid deck size!" });
+      close();
+      return;
+    }
+
+    for (const cardKey of [...new Set(deck)]) {
+      if (!cards[cardKey]) {
+        res.status(400).send({ error: "Invalid deck cards!" });
+        close();
+        return;
       }
     }
-    res.status(400).json({ error: "Invalid socket connection" });
-    close();
-  });
-});
 
-postSetDeck.route = { params: [], method: "post" };
+    try {
+      await prisma.deck.upsert({
+        where: {
+          userFirebaseId: socket.uid,
+        },
+        create: {
+          userFirebaseId: socket.uid,
+          cards: deck,
+        },
+        update: {
+          cards: deck,
+        },
+      });
+      res.status(201).send({ success: "Deck salvo com sucesso!" });
+    } catch {
+      res.status(400).send({ error: "Invalid deck!" });
+    }
+    close();
+    return;
+  })
+);
+
+saveDeck.route = { params: [], method: "post" };

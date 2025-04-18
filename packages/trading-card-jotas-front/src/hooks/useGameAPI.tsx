@@ -4,7 +4,7 @@ import { useCallback } from "react";
 export function useGameAPI() {
   const saveDeck = useCallback(
     (deck: Cards[], token: string) =>
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/setDeck`, {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/saveDeck`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -12,7 +12,7 @@ export function useGameAPI() {
           authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(deck),
-      }).then((stream) => stream.json()),
+      }).then((stream) => stream.json() as { success?: string }),
     []
   );
 

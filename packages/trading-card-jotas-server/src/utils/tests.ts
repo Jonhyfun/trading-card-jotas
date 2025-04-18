@@ -5,7 +5,7 @@
         cardStack: [],
         cardVisualEffects: [],
         ip: "TESTE",
-      } as Partial<UserData>;
+      } as Partial<PlayerType>;
     
     
     ([
@@ -28,8 +28,8 @@
     
       const parsedCards = tmpUser.cardStack!.map(({ cardKey }) => CardsObject[cardKey].default)
     
-      tmpUser.points!.push(handlePointsSum(tmpUser as UserData, parsedCards))
-      handleVisualEffects(tmpUser as UserData, parsedCards)
+      tmpUser.points!.push(handlePointsSum(tmpUser as PlayerType, parsedCards))
+      handleVisualEffects(tmpUser as PlayerType, parsedCards)
     
       console.log(tmpUser.points)
       console.log(tmpUser.cardVisualEffects)

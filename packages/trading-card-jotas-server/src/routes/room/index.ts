@@ -1,15 +1,17 @@
+import type { Cards } from "trading-card-jotas-types/cards/types";
+import prisma from "@/providers/prisma";
 import { wrapRoute } from "../types";
-import { getRooms, setRooms } from "@/states/room";
+import { getRoom, getRooms, setRooms } from "@/states/room";
 import { withAuthorization } from "../middlewares";
-import { removeUserFromRoom } from "@/utils/game/room";
 import { validDeck } from "../../utils/game/deck/validations";
-import { RoomPlayer } from "@/states/socket";
+import { Room } from "@/models/room";
+import { Game } from "@/models/game";
 
 export const getRoomsRoute = wrapRoute("rooms", (req, res, close) => {
   res.send(
-    Object.entries(getRooms()).map(([key, players]) => ({
+    Object.entries(getRooms()).map(([key, room]) => ({
       room: key,
-      playerCount: players.length,
+      playerCount: Object.keys(room.game.players).length,
     }))
   );
   close();
@@ -26,87 +28,70 @@ currentSocket.route = { params: [], method: "get" };
 export const joinRoom = wrapRoute<Record<"room", string>>(
   "joinRoom",
   (req, res, close) =>
-    withAuthorization(req, res, close, (user, socket) => {
-      //TODO zod please lol
-      const room = req.params.room;
-      console.log(req.cookies);
-
-      socket.room = room;
+    withAuthorization(req, res, close, async (user, socket) => {
+      const roomId = req.params.room;
 
       const onUserJoinRoom = () => {
         socket.onclose = () => {
-          removeUserFromRoom(socket, room);
+          room.leave(socket.player);
         };
         socket.send(`setStance/${socket.player.stance}`);
         socket.send("joinedRoom");
       };
 
-      setRooms((current) => {
-        const alreadyConnectedUserIndex = current[room]
-          ? current[room].findIndex(({ uid }) => uid === socket.uid)
-          : -1;
+      const userDeck = await prisma.deck.findFirstOrThrow({
+        where: {
+          userFirebaseId: socket.uid,
+        },
+      });
 
-        if (
-          alreadyConnectedUserIndex !== -1 &&
-          alreadyConnectedUserIndex !== undefined
-        ) {
-          const removedUser = current[room].splice(
-            alreadyConnectedUserIndex,
-            1
-          )[0];
+      if (!userDeck || !validDeck(userDeck.cards as Cards[])) {
+        socket.send("error/Deck inválido!");
+        socket.send("redirect/-");
+        console.log(`${socket.uid} has an invalid deck!`);
+        return { error: true };
+      }
 
-          Object.keys(removedUser).forEach((key) => {
-            socket[key as keyof RoomPlayer] = removedUser[
-              key as keyof RoomPlayer
-            ] as never;
-          });
+      socket.player.dispatchDeck(userDeck.cards as Cards[]);
 
-          onUserJoinRoom();
+      let room: Room = getRoom(roomId);
+      if (!room) {
+        room = new Room(roomId, new Game());
+        setRooms((current) => ({ ...current, [roomId]: room }));
+      }
 
-          console.log("forced A");
-          return {
-            ...current,
-            [room]: [...current[room], socket],
-          };
-        }
+      socket.room = roomId;
 
-        if (!validDeck(socket.player.deck.map(({ cardKey }) => cardKey))) {
-          socket.send("error/Deck inválido!");
-          socket.send("redirect/-");
-          console.log("forced B");
-          return current;
-        }
+      //console.log(room);
 
-        if (current[room]?.length === 2) {
-          socket.send("error/Sala cheia!");
-          socket.send("redirect/rooms");
-          console.log("forced C");
-          return current;
-        }
+      if (room.game.players[socket.uid]) {
+        const disconnectedUser = room.game.players[socket.uid];
+        socket.player = disconnectedUser;
 
-        if (current[room]?.[0]) {
-          onUserJoinRoom();
-          console.log(
-            `${socket.uid} entrou em ${room} como ${socket.player.stance}`
-          );
-
-          current[room][0].send("setGameState/running");
-          socket.send("setGameState/running");
-          console.log("forced D");
-          return {
-            ...current,
-            [room]: [current[room][0], socket],
-          };
-        }
+        console.log(`${socket.uid} rejoined!`);
 
         onUserJoinRoom();
+        return { success: true };
+      }
 
-        console.log(
-          `${socket.uid} entrou em ${room} como ${socket.player.stance}`
-        );
+      if (Object.keys(room.game.players).length === 2) {
+        socket.send("error/Sala cheia!");
+        socket.send("redirect/rooms");
+        console.log(`${socket.uid} tried to join a full room!`);
+        return { error: true };
+      }
 
-        return { ...current, [room]: [socket] };
-      });
+      room.join(socket.player);
+      onUserJoinRoom();
+      console.log(`${socket.uid} joined ${room.id} as ${socket.player.stance}`);
+
+      if (Object.keys(room.game.players).length === 2) {
+        Object.values(room.game.players).forEach((player) => {
+          player.loadDeck();
+          player.dealHand();
+        });
+        room.broadcast("setGameState/running");
+      }
 
       return { success: true };
     })

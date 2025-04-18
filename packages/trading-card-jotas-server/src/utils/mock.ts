@@ -1,7 +1,7 @@
-import type { ConnectedSocket, UserData } from "@/states/socket";
+import type { ConnectedSocket, PlayerType } from "@/states/socket";
 import { DeckCard } from "../../../trading-card-jotas-types/cards/types";
 
-export const initialUserData: UserData = {
+export const initialPlayerType: PlayerType = {
   stance: "attack",
   points: [],
   cardVisualEffects: [],
@@ -18,8 +18,8 @@ export const initialUserData: UserData = {
 export const getMockConnectedUser = (
   room: string,
   deck: DeckCard[]
-): UserData & Pick<ConnectedSocket, "send"> => ({
-  ...initialUserData,
+): PlayerType & Pick<ConnectedSocket, "send"> => ({
+  ...initialPlayerType,
   ingameDeck: deck,
   stance: "attack",
   room,

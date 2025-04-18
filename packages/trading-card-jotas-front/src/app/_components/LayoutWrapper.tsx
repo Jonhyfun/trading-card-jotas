@@ -26,17 +26,17 @@ function AppContent({ children }: PropsWithChildren<unknown>) {
         style={{ height: "4rem", margin: 0 }}
         toastStyle={{
           ...pixelBorder(hexToRgb(Palette["gray-light"])!),
-          boxShadow: `inset black 0px 0px 0px 4px, black 0px 0px 0px 4px`,
+          boxShadow: `inset black 0px 0px 0px 3px, black 0px 0px 0px 4px`,
         }}
-        className="border-2 border-gray w-full p-0"
-        toastClassName={`${pixelFont.className} rounded-none bg-bg-internal text-sm text-black p-0 border-solid border-2 border-white`}
+        className="border-0 w-full p-0"
+        toastClassName={`${pixelFont.className} flex items-center justify-center rounded-none bg-bg-internal text-sm text-black p-3 border-solid border-2 border-white`}
         position="bottom-center"
         autoClose={3000}
+        icon={false}
         hideProgressBar
         newestOnTop
         closeOnClick
         rtl={false}
-        draggable
         theme="light"
       />
     </>

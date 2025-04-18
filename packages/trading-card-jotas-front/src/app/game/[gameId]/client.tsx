@@ -1,9 +1,9 @@
 "use client";
 
-import type { GameData, Player } from "trading-card-jotas-types";
+import type { GameData, PlayerType } from "trading-card-jotas-types";
 import { Card } from "@/components/Card";
 import { type DeckCards, PlayerDeck } from "@/components/PlayerDeck";
-import { type CardData, StackedCards } from "@/components/StackedCards";
+import { type CardType, StackedCards } from "@/components/StackedCards";
 import { useGameSocket } from "@/hooks/useGameSocket";
 import { Layout } from "@/layout";
 import { useRouter } from "next/navigation";
@@ -18,19 +18,19 @@ export function Game({ gameId }: { gameId: string }) {
   // const { joinRoom, lockStance, placeCard, leaveRoom, gameData } =
   //   useGameSocket();
 
-  const gameData = {} as GameData & Player;
+  const gameData = {} as GameData & PlayerType;
 
-  const [selectedCard, setSelectedCard] = useState<CardData>();
+  const [selectedCard, setSelectedCard] = useState<CardType>();
   const [deck, setDeck] = useState<DeckCards | null>(null);
 
-  const [myCards, setMyCards] = useState<CardData[]>([]);
-  const [otherCards, setOtherCards] = useState<CardData[]>([]);
+  const [myCards, setMyCards] = useState<CardType[]>([]);
+  const [otherCards, setOtherCards] = useState<CardType[]>([]);
 
   const myStackRef = useRef<HTMLOListElement>(null);
   const otherStackRef = useRef<HTMLOListElement>(null);
 
   const handleCardPlacement = useCallback(
-    (card: CardData) => {
+    (card: CardType) => {
       //lockStance();
       //placeCard(card.id);
       setSelectedCard(undefined);

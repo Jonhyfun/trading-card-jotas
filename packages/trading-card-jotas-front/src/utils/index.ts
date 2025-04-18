@@ -4,16 +4,19 @@ export const pixelBorder = (fill: string, outset = 2, width = 2) => ({
   borderImageWidth: 2,
   borderImageOutset: outset,
   borderWidth: 2,
-})
+});
 
 export const hexToRgb = (hex: string) => {
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? `rgb(${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)})` : null;
-}
+  return result
+    ? `rgb(${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)})`
+    : null;
+};
 
 export const makeId = (length: number) => {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = "";
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const charactersLength = characters.length;
   let counter = 0;
   while (counter < length) {
@@ -21,22 +24,21 @@ export const makeId = (length: number) => {
     counter += 1;
   }
   return result;
-}
-
+};
 
 export const toggleCRT = (callback: (crtOn: boolean) => void) => {
-  const body = document.querySelector('body')
-  if (!body) return
+  const body = document.querySelector("body");
+  if (!body) return;
 
-  body.classList.toggle('crt')
-  callback(body.classList.contains('crt'))
-}
+  body.classList.toggle("crt");
+  callback(body.classList.contains("crt"));
+};
 
-export type Subtract<T, U> = T & Exclude<T, U>
+export type Subtract<T, U> = T & Exclude<T, U>;
 
 export type PickEndsWith<T extends object, S extends string> = {
-  [K in keyof T as K extends `${infer R}${S}` ? K : never]: T[K]
-}
+  [K in keyof T as K extends `${infer R}${S}` ? K : never]: T[K];
+};
 
 export type StripPrefix<
   TPrefix extends string,
@@ -46,20 +48,20 @@ export type StripPrefix<
 //? Os tons são diferentes e não mais claros/escuros para simular as limitações de um gameboy
 
 export const Palette = {
-  "bg-internal": '#e0e0c0',
-  "bg-external": '#7d82a4',
+  "bg-internal": "#e0e0c0",
+  "bg-external": "#7d82a4",
 
-  "primary": '#2db36b',
-  "primary-light": '#00d0cc',
+  primary: "#2db36b",
+  "primary-light": "#00d0cc",
 
-  "secondary": "#d00004",
+  secondary: "#d00004",
   "secondary-light": "#b32d75",
 
-  "gray": '#848479',
-  "gray-light": '#c2c2a6',
-}
+  gray: "#848479",
+  "gray-light": "#c2c2a6",
+};
 
-// export const mockCards: Omit<CardData, 'borderColor'>[] = [
+// export const mockCards: Omit<CardType, 'borderColor'>[] = [
 //   {
 //     id: '1',
 //     src: 'http://localhost/cardImage/two.png',

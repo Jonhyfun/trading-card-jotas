@@ -1,15 +1,14 @@
-import { UserData } from "../../../trading-card-jotas-server/src/initializers/webSocket";
-import { CardData } from "../types";
+import type { CardType, PlayerType } from "../types";
 
-const cardData: CardData = {
+const Card: CardType = {
   label: "#",
   value: -2,
   limit: 3,
   desc: "No próximo turno você e seu oponente continuam na mesma pilha (essa carta vale -2 pontos).",
-  effect: (cardOwner: UserData, otherPlayer: UserData) => {
-    cardOwner.globalEffects.push("sendRepeatedTurn");
-    otherPlayer.globalEffects.push("sendRepeatedTurn");
+  effect: (cardOwner: PlayerType, otherPlayer: PlayerType) => {
+    cardOwner.effects.push("keepStance");
+    otherPlayer.effects.push("keepStance");
   },
 };
 
-export default cardData;
+export default Card;

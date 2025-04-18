@@ -1,31 +1,23 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "trading-card-jotas-types": [
-        "../trading-card-jotas-types/dist"
-      ]
+      "@/*": ["./src/*"],
+      "trading-card-jotas-types": ["../trading-card-jotas-types/dist"]
     },
     "forceConsistentCasingInFileNames": true,
-    "target": "ES2017",
+    "target": "es2022",
     "plugins": [
       {
         "name": "next"
@@ -33,12 +25,12 @@
     ]
   },
   "include": [
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "next-env.d.ts",
+    "**/*.cjs",
+    "**/*.js",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

@@ -1,12 +1,11 @@
-import { UserData } from "../../../trading-card-jotas-server/src/initializers/webSocket";
-import { CardData } from "../types";
+import type { CardType } from "../types";
 
-const cardData: CardData = {
+const Card: CardType = {
   label: "0",
   value: 0,
   limit: 2,
   desc: "Durante a divisão o 0 vale 1.",
-  effect: (castingPlayer: UserData, otherPlayer: UserData) => {},
+  effect: () => {},
 };
 
-export default cardData;
+export default Card;

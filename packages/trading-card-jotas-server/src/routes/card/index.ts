@@ -30,8 +30,8 @@ getVisualEffects.route = { params: ["effectName"], method: "get" };
 
 export const getCards = wrapRoute("cards", (req, res) => {
   const result = Object.entries(cards).map(
-    ([cardKey, { default: cardData }]) => {
-      const { effect, ...cardProps } = cardData;
+    ([cardKey, { default: CardType }]) => {
+      const { effect, ...cardProps } = CardType;
       return {
         key: cardKey,
         src: `/cardImage/${cardKey}.png`,
