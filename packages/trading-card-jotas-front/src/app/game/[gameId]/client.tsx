@@ -3,7 +3,7 @@
 import type { GameData, PlayerType } from "trading-card-jotas-types";
 import { Card } from "@/components/Card";
 import { type DeckCards, PlayerDeck } from "@/components/PlayerDeck";
-import { type CardType, StackedCards } from "@/components/StackedCards";
+import { type DisplayCardType, StackedCards } from "@/components/StackedCards";
 import { useGameSocket } from "@/hooks/useGameSocket";
 import { Layout } from "@/layout";
 import { useRouter } from "next/navigation";
@@ -20,17 +20,17 @@ export function Game({ gameId }: { gameId: string }) {
 
   const gameData = {} as GameData & PlayerType;
 
-  const [selectedCard, setSelectedCard] = useState<CardType>();
-  const [deck, setDeck] = useState<DeckCards | null>(null);
+  const [selectedCard, setSelectedCard] = useState<DisplayCardType>();
+  const [deck, setDeck] = useState<DeckCards>([]);
 
-  const [myCards, setMyCards] = useState<CardType[]>([]);
-  const [otherCards, setOtherCards] = useState<CardType[]>([]);
+  const [myCards, setMyCards] = useState<DisplayCardType[]>([]);
+  const [otherCards, setOtherCards] = useState<DisplayCardType[]>([]);
 
   const myStackRef = useRef<HTMLOListElement>(null);
   const otherStackRef = useRef<HTMLOListElement>(null);
 
   const handleCardPlacement = useCallback(
-    (card: CardType) => {
+    (card: DisplayCardType) => {
       //lockStance();
       //placeCard(card.id);
       setSelectedCard(undefined);
@@ -128,7 +128,7 @@ export function Game({ gameId }: { gameId: string }) {
         </div>
       ) : (
         <div className="h-full w-full flex flex-col">
-          <PlayerDeck playerSrc="/bowgor80.png" rival />
+          <PlayerDeck playerSrc="/bowgor80.png" deck={[]} rival />
           <div
             className={`w-full h-full flex justify-between flex-col gap-2 pt-6 ${
               selectedCard ? "" : "pb-4"
@@ -204,7 +204,7 @@ export function Game({ gameId }: { gameId: string }) {
           </div>
           <PlayerDeck
             playerSrc="/indio80.png"
-            deckState={[deck, setDeck]} //TODO nao vai atualizar kkkkkk (melhor extrair o state, paciencia)
+            deck={deck}
             gameData={gameData}
             onCardClick={(card) => {
               setSelectedCard((current) =>

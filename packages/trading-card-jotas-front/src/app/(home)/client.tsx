@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Palette, pixelBorder } from "@/utils";
+import { pixelBorder } from "@/utils";
 import { TripleBorder } from "@/components/TripleBorder";
 import { Layout } from "@/layout";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { makeId } from "@/utils";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/Input";
 import { GoogleLoginButton } from "@/components/GoogleButton";
@@ -16,6 +15,7 @@ import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { errorToast } from "@/utils/toast";
 import { Loading } from "@/components/Loading";
 import { useTypewriter } from "@/hooks/useTypewriter";
+import { useGameAPI } from "@/hooks/useGameAPI";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -96,9 +96,8 @@ function LoginPage() {
   );
 }
 
-function HomePage() {
+function HomePage({ deckValid }: { deckValid: boolean }) {
   const router = useRouter();
-  const { localDeck } = useLocalStorage();
   const title = useTypewriter("Stackquation", 100);
 
   const createGame = useCallback(() => {
@@ -129,9 +128,7 @@ function HomePage() {
           <div
             onClick={createGame}
             className={`${
-              localDeck && localDeck.length === 20
-                ? "group"
-                : "cursor-auto opacity-40"
+              deckValid ? "group" : "cursor-auto opacity-40"
             } cursor-pointer`}
           >
             <span className="group-hover:visible invisible mr-2">*</span>
@@ -153,17 +150,31 @@ function HomePage() {
   );
 }
 
-export default function Home() {
+export function Home() {
   const { user, loading } = useAuth();
+  const { getDeck } = useGameAPI();
+  const [deckValid, setDeckValid] = useState<boolean>();
+
+  useEffect(() => {
+    if (!loading) {
+      if (user?.token) {
+        void getDeck(user.token).then((deck) => {
+          setDeckValid(deck && deck.cards.length === 20);
+        });
+      } else {
+        setDeckValid(false);
+      }
+    }
+  }, [getDeck, loading, user?.token]);
 
   return (
     <Layout>
-      {loading ? (
+      {loading || deckValid === undefined ? (
         <Loading />
       ) : (
         <>
           {!user && <LoginPage />}
-          {user && <HomePage />}
+          {user && <HomePage deckValid={deckValid} />}
         </>
       )}
     </Layout>

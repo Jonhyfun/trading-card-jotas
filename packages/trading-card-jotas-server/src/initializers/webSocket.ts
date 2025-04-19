@@ -2,11 +2,10 @@ import * as Events from "@/wsEvents";
 import http from "http";
 import https from "https";
 import { readFileSync } from "fs";
-import { WebSocketServer } from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 
 import type { Express } from "express";
-import type { WebSocket } from "ws";
-import { setSockets, type ConnectedSocket } from "@/states/socket";
+import { type ConnectedSocket, setSockets } from "@/states/socket";
 import { isDev } from "../utils/meta";
 import { getAuth } from "firebase-admin/auth";
 import { Player } from "@/models/player";
@@ -23,8 +22,12 @@ export function InitializeWebSocket(app: Express) {
 
   const wss = new WebSocketServer({ server, maxPayload: 2 * 1024 }); //2kb
 
-  wss.on("connection", (ws: WebSocket & ConnectedSocket) => {
+  wss.on("connection", (ws: ConnectedSocket) => {
     if (!ws.protocol || ws.protocol.length < 100) return ws.close();
+
+    ws.sendEvent = (event, data) => {
+      ws.send(`${event}/${JSON.stringify(data)}`);
+    };
 
     getAuth()
       .verifyIdToken(ws.protocol)
@@ -40,12 +43,8 @@ export function InitializeWebSocket(app: Express) {
           const message = Events[key as keyof typeof Events];
 
           if (message) {
-            message(ws, value as any);
+            message(ws, value as unknown);
           }
-          //else if (data.toString() !== 'V1.2') {
-          //  ws.send('mismatch');
-          //  ws.close();
-          //}
         });
       })
       .catch(() => {

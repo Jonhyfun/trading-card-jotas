@@ -1,4 +1,9 @@
+import WebSocket from "ws";
 import type { Player } from "@/models/player";
+import type {
+  SocketEventData,
+  SocketEvents,
+} from "trading-card-jotas-types/types";
 
 export interface RoomPlayer {
   uid: string;
@@ -6,7 +11,13 @@ export interface RoomPlayer {
   room: string;
 }
 
-export type ConnectedSocket = WebSocket & RoomPlayer;
+export interface ConnectedSocket extends WebSocket, RoomPlayer {
+  //
+  sendEvent: <T extends SocketEvents>(
+    event: T,
+    data: SocketEventData<T>
+  ) => void;
+}
 
 type SocketsType = Record<string, ConnectedSocket>;
 let sockets: SocketsType = {};

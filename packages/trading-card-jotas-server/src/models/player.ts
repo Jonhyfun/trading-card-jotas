@@ -4,15 +4,16 @@ import type {
   DeckCard,
   PlayerEffects,
   PlayerType,
-} from "trading-card-jotas-types/cards/types";
+} from "trading-card-jotas-types";
 import { makeId, shuffle } from "@/utils/random";
 import { Room } from "./room";
 import { validDeck } from "@/utils/game/deck/validations";
 import { Points } from "./points";
 import { Stack } from "./stack";
+import { PlayerSocket } from "./socket";
 
 export class Player implements PlayerType {
-  socket: ConnectedSocket;
+  socket: PlayerSocket;
   uid: ConnectedSocket["uid"];
 
   hand!: DeckCard[];
@@ -28,26 +29,28 @@ export class Player implements PlayerType {
   #room!: Room;
 
   constructor(ws: ConnectedSocket, _stance = "attack" as typeof this.stance) {
-    this.socket = ws;
     this.uid = ws.uid;
     this.stance = _stance;
+    this.socket = new PlayerSocket(ws, this);
   }
 
   getPoints() {
-    return this.#points.getPoints;
+    return this.#points.getPoints();
   }
 
   calculatePoints() {
-    return this.#points.calculatePoints;
+    return this.#points.calculatePoints();
+  }
+
+  getRoomId() {
+    return this.#room.id;
   }
 
   onJoinRoom(room: Room) {
-    this.socket.onclose = () => {
-      room.leave(this);
-    };
     this.#room = room;
-    this.socket.send(`setStance/${this.socket.player.stance}`);
-    this.socket.send("joinedRoom");
+    this.socket.handleRoomJoin(() => {
+      room.leave(this);
+    });
   }
 
   placeCard(cardId: DeckCard["id"]) {
@@ -77,7 +80,7 @@ export class Player implements PlayerType {
         this.#initial_deck.push({ cardKey, id: `${i}-${makeId(8)}` });
       });
 
-      console.log(`${this.socket.uid} loaded the deck on the socket`);
+      console.log(`${this.uid} loaded the deck on the socket`);
     }
   }
 

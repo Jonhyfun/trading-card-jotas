@@ -18,10 +18,4 @@ export class Room {
   leave(player: Player) {
     delete this.game.players[player.uid];
   }
-
-  broadcast(data: string) {
-    Object.values(this.game.players).forEach((player) => {
-      player.socket.send(data);
-    });
-  }
 }

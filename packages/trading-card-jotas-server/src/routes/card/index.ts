@@ -1,11 +1,12 @@
-import * as cards from "trading-card-jotas-types/cards";
+import { cards } from "trading-card-jotas-types";
 import { wrapRoute } from "../types";
+import { getCardImagePath } from "@/utils/path";
 
 export const getCardImage = wrapRoute<{ cardName: string }>(
   "cardImage",
   (req, res, close) => {
     const cardName = req.params.cardName.split(".")[0];
-    res.sendFile(`/${cardName}/${cardName}.png`, { root: "src/cards" }, (err) =>
+    res.sendFile(getCardImagePath(cardName), (err) =>
       res.status(404).send(err)
     );
     close();

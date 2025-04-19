@@ -1,5 +1,5 @@
 import type { ConnectedSocket, PlayerType } from "@/states/socket";
-import { DeckCard } from "../../../trading-card-jotas-types/cards/types";
+import { DeckCard } from "trading-card-jotas-types/types";
 
 export const initialPlayerType: PlayerType = {
   stance: "attack",

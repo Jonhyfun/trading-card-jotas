@@ -2,8 +2,8 @@ import type {
   DeckCard,
   StackType,
   VisualEffects,
-} from "trading-card-jotas-types/cards/types";
-import * as cards from "trading-card-jotas-types/cards";
+} from "trading-card-jotas-types";
+import { cards } from "trading-card-jotas-types";
 import { Player } from "./player";
 
 export class Stack implements StackType {

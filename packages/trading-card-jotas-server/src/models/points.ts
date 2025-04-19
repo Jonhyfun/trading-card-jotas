@@ -1,6 +1,6 @@
 import { create, all } from "mathjs";
 import { Player } from "./player";
-import * as cards from "trading-card-jotas-types/cards";
+import { cards } from "trading-card-jotas-types/";
 
 import {
   equationSanitizer,

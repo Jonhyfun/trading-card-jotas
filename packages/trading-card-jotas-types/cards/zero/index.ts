@@ -1,4 +1,4 @@
-import type { CardType } from "../types";
+import type { CardType } from "../../types";
 
 const Card: CardType = {
   label: "0",

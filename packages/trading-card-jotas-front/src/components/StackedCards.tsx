@@ -6,30 +6,27 @@ import {
   forwardRef,
   useCallback,
   useEffect,
-  useMemo,
   useState,
 } from "react";
+import type { TripleBorderProps } from "./TripleBorder";
+import type { DeckCard, GameData } from "trading-card-jotas-types";
 import { Card } from "./Card";
 import { errorToast } from "@/utils/toast";
 import { useCards } from "@/hooks/useCards";
-import { type TripleBorderProps } from "./TripleBorder";
-import type { GameData } from "trading-card-jotas-types";
 
 //todo Matematica Man
 
-export type CardType = {
-  cardKey: string;
+export interface DisplayCardType extends DeckCard {
   src: string;
-  id: string;
   borderColor: Exclude<TripleBorderProps["borderColor"], undefined>;
-};
+}
 
 type StackedCardsProps = {
-  cardState: [CardType[], Dispatch<SetStateAction<CardType[]>>];
+  cardState: [DisplayCardType[], Dispatch<SetStateAction<DisplayCardType[]>>];
   forStance?: "attack" | "defense";
-  selectedCard?: CardType;
-  onCardPlacement?: (card: CardType) => void;
-  onCardClick?: (card: CardType) => void;
+  selectedCard?: DisplayCardType;
+  onCardPlacement?: (card: DisplayCardType) => void;
+  onCardClick?: (card: DisplayCardType) => void;
   gameData: GameData;
 };
 
@@ -48,7 +45,7 @@ export const StackedCards = forwardRef(
     const { cards: cardsData } = useCards();
     const [cards, setCards] = cardState;
     const [hoveredCardId, setHoveredCardId] = useState<
-      CardType["id"] | undefined
+      DisplayCardType["id"] | undefined
     >();
 
     //const visualEffects = useMemo(

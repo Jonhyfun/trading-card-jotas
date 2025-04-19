@@ -1,18 +1,16 @@
 "use client";
 
+import type { Cards } from "trading-card-jotas-types";
+import type { BackendCard } from "@/hooks/useCards";
+import { type LightColors, TripleBorder } from "@/components/TripleBorder";
+import { type MouseEvent, useCallback, useState } from "react";
 import Link from "next/link";
-import type { Cards } from "trading-card-jotas-types/cards/types";
 import { Card } from "@/components/Card";
 import { Layout } from "@/layout";
-import { MouseEvent, useCallback, useEffect, useState } from "react";
-import { LightColors, TripleBorder } from "@/components/TripleBorder";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { errorToast, successToast } from "@/utils/toast";
-import { type BackendCard, useCards } from "@/hooks/useCards";
 import { useCardModal } from "@/hooks/useCardModal";
 import { useGameAPI } from "@/hooks/useGameAPI";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "react-toastify";
 
 const addModes = {
   add: "Adicionar",
@@ -26,18 +24,22 @@ const addModesColors: { [key in keyof typeof addModes]: LightColors } = {
   info: "gray-light",
 };
 
-export function DeckClient({ cards }: { cards: BackendCard[] }) {
-  //TODO shared types
+export function DeckClient({
+  cards,
+  deck: _initialDeck,
+}: {
+  cards: BackendCard[];
+  deck: Cards[];
+}) {
   const { user } = useAuth();
   const { saveDeck } = useGameAPI();
   const { openCardModal } = useCardModal();
-  const { commitLocalDeck, localDeck } = useLocalStorage();
   const [addMode, setAddMode] = useState<(keyof typeof addModes)[]>([
     "add",
     "info",
     "remove",
   ]);
-  const [deck, setDeck] = useState<Cards[]>([]);
+  const [deck, setDeck] = useState<Cards[]>(_initialDeck);
 
   const toggleAddMode = useCallback(() => {
     setAddMode((current) => {
@@ -109,12 +111,6 @@ export function DeckClient({ cards }: { cards: BackendCard[] }) {
       })
       .catch(() => errorToast("Deck inválido!"));
   }, [deck, saveDeck, user]);
-
-  useEffect(() => {
-    if (localDeck && localDeck.length === 20) {
-      setDeck(localDeck as Cards[]);
-    }
-  }, [localDeck]);
 
   return (
     <Layout>

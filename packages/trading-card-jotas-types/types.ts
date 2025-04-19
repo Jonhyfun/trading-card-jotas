@@ -1,4 +1,4 @@
-import * as cards from "./index";
+import * as cards from "./cards/index";
 
 export type Cards = keyof typeof cards;
 
@@ -37,7 +37,27 @@ export interface CardType {
   effect: (cardOwner: PlayerType, otherPlayer: PlayerType) => void;
 }
 
-export type PlayerSyncData = Pick<PlayerType, "hand" | "effects" | "stance"> & {
+export type GameState = "waitingForPlayers" | "running" | "victory" | "defeat";
+
+export type GameData = {
+  id: string;
+  state: GameState;
+  players: 0 | 1 | 2;
+  spectators?: number;
+};
+
+export interface PlayerSyncData
+  extends Pick<PlayerType, "hand" | "effects" | "stance"> {
   stack: DeckCard[];
   points: string;
-};
+}
+
+interface SocketEventsDefinition {
+  error: { message: string; redirectPath?: string };
+  matchStatus: { status: GameState; message?: string };
+  redirect: { path: string };
+  syncData: PlayerSyncData;
+}
+
+export type SocketEvents = keyof SocketEventsDefinition;
+export type SocketEventData<T extends SocketEvents> = SocketEventsDefinition[T];

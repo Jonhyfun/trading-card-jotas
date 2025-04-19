@@ -1,4 +1,4 @@
-import type { Cards } from "trading-card-jotas-types/cards/types";
+import type { Cards } from "trading-card-jotas-types/cards";
 import prisma from "@/providers/prisma";
 import { wrapRoute } from "../types";
 import { getRoom, getRooms, setRooms } from "@/states/room";
@@ -31,14 +31,6 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
     withAuthorization(req, res, close, async (user, socket) => {
       const roomId = req.params.room;
 
-      const onUserJoinRoom = () => {
-        socket.onclose = () => {
-          room.leave(socket.player);
-        };
-        socket.send(`setStance/${socket.player.stance}`);
-        socket.send("joinedRoom");
-      };
-
       const userDeck = await prisma.deck.findFirstOrThrow({
         where: {
           userFirebaseId: socket.uid,
@@ -46,8 +38,8 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
       });
 
       if (!userDeck || !validDeck(userDeck.cards as Cards[])) {
-        socket.send("error/Deck inválido!");
-        socket.send("redirect/-");
+        socket.sendEvent("error", { message: "Deck inválido!" });
+        socket.sendEvent("redirect", { path: "-" });
         console.log(`${socket.uid} has an invalid deck!`);
         return { error: true };
       }
@@ -69,28 +61,25 @@ export const joinRoom = wrapRoute<Record<"room", string>>(
         socket.player = disconnectedUser;
 
         console.log(`${socket.uid} rejoined!`);
-
-        onUserJoinRoom();
         return { success: true };
       }
 
       if (Object.keys(room.game.players).length === 2) {
-        socket.send("error/Sala cheia!");
-        socket.send("redirect/rooms");
+        socket.sendEvent("error", { message: "Sala cheia!" });
+        socket.sendEvent("redirect", { path: "rooms" });
         console.log(`${socket.uid} tried to join a full room!`);
         return { error: true };
       }
 
       room.join(socket.player);
-      onUserJoinRoom();
       console.log(`${socket.uid} joined ${room.id} as ${socket.player.stance}`);
 
       if (Object.keys(room.game.players).length === 2) {
         Object.values(room.game.players).forEach((player) => {
           player.loadDeck();
           player.dealHand();
+          player.socket.sendMatchStatus("running");
         });
-        room.broadcast("setGameState/running");
       }
 
       return { success: true };

@@ -1,9 +1,6 @@
-import * as cards from "trading-card-jotas-types/cards";
-import type {
-  DeckCard,
-  PlayerSyncData,
-} from "trading-card-jotas-types/cards/types";
+import type { DeckCard } from "trading-card-jotas-types";
 import type { ConnectedSocket } from "@/states/socket";
+import { cards } from "trading-card-jotas-types";
 import { deleteRoom } from "@/states/room";
 import { Player } from "./player";
 
@@ -35,18 +32,17 @@ export class Game {
     const defenseWins =
       defendingPlayer.getPoints() > attackingPlayer.getPoints();
 
-    attackingPlayer.socket.send(
-      `${attackWins ? "endWining" : "endLosing"}/${
-        attackWins ? "Você venceu!" : "Você perdeu..."
-      }`
-    );
-    defendingPlayer.socket.send(
-      `${defenseWins ? "endWining" : "endLosing"}/${
-        defenseWins ? "Você venceu!" : "Você perdeu..."
-      }`
+    attackingPlayer.socket.sendMatchStatus(
+      attackWins ? "victory" : "defeat",
+      attackWins ? "Você venceu!" : "Você perdeu..."
     );
 
-    deleteRoom(attackingPlayer.socket.room);
+    defendingPlayer.socket.sendMatchStatus(
+      defenseWins ? "victory" : "defeat",
+      defenseWins ? "Você venceu!" : "Você perdeu..."
+    );
+
+    deleteRoom(attackingPlayer.getRoomId());
   }
 
   #getStacks(playerId: keyof Players) {
@@ -191,7 +187,7 @@ export class Game {
 
     if (!otherPlayer) {
       this.currentSetCards[ownerId] = undefined;
-      return roomPlayers[0].socket.send("error/Sala vazia!");
+      return roomPlayers[0].socket.sendError("sala vazia!", "/");
     }
 
     if (roomPlayers.every((player) => this.currentSetCards[player.uid])) {
@@ -213,15 +209,7 @@ export class Game {
 
   syncData() {
     Object.values(this.players).forEach((player) => {
-      player.socket.send(
-        `syncData/${JSON.stringify({
-          points: player.getPoints().toString(),
-          hand: player.hand,
-          stack: player.stack.cards,
-          stance: player.stance,
-          effects: player.effects,
-        } as PlayerSyncData)}`
-      );
+      player.socket.sendSyncData();
     });
   }
 }

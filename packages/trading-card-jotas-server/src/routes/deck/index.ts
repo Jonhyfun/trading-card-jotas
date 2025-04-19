@@ -1,11 +1,30 @@
-import type { Cards } from "trading-card-jotas-types/cards/types";
-import * as cards from "trading-card-jotas-types/cards";
+import type { Cards } from "trading-card-jotas-types";
+import { cards } from "trading-card-jotas-types";
 import prisma from "@/providers/prisma";
 import { DECK_SIZE } from "trading-card-jotas-types/consts";
 import { wrapRoute } from "../types";
 import { withAuthorization } from "../middlewares";
 
-export const saveDeck = wrapRoute("saveDeck", (req, res, close) =>
+export const getDeck = wrapRoute("deck", (req, res, close) =>
+  withAuthorization(req, res, close, async (user, socket) => {
+    try {
+      const { cards } = await prisma.deck.findFirstOrThrow({
+        where: {
+          userFirebaseId: socket.uid,
+        },
+      });
+      res.status(200).send({ cards });
+    } catch {
+      res.status(204).end();
+    }
+    close();
+    return;
+  })
+);
+
+getDeck.route = { params: [], method: "get" };
+
+export const saveDeck = wrapRoute("deck", (req, res, close) =>
   withAuthorization(req, res, close, async (user, socket) => {
     const deck = req.body as Cards[];
 

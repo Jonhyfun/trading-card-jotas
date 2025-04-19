@@ -83,3 +83,7 @@ export const Palette = {
 //     src: 'http://localhost/cardImage/interrogation.png',
 //   },
 // ]
+
+export const noop = () => {
+  //
+};

@@ -1,6 +1,6 @@
-import type { Cards } from "trading-card-jotas-types/cards/types";
+import type { Cards } from "trading-card-jotas-types";
 import { DECK_SIZE } from "trading-card-jotas-types/consts";
-import * as cards from "trading-card-jotas-types/cards";
+import { cards } from "trading-card-jotas-types";
 
 export function validDeck(deck?: Cards[]) {
   //TODO return reason?

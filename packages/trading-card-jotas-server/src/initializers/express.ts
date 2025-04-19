@@ -18,7 +18,7 @@ export function InitializeExpress() {
   app.get(
     "/.well-known/acme-challenge/x7azHRAgMEpyyHHIUgj21_0-0NUcqxKOywy-RAvsyAQ",
     (req, res) => {
-      //TODO esconder isso kkkkk
+      //TODO hide this (doesnt matter because it was already validated)
       res
         .send(
           "x7azHRAgMEpyyHHIUgj21_0-0NUcqxKOywy-RAvsyAQ.JdBjlVg4ZbelazlWDsncgBeQtHeDOGkT6JO6-bwjWYs"
